@@ -3,9 +3,8 @@
 
 extern "C" {
 JNIEXPORT void JNICALL
-Java_uk_lgl_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
-     MakeToast(env, context, OBFUSCATE("Modded by LGL"), Toast::LENGTH_LONG);
+Java_com_tfive_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
+     //ToastHere
 }
 }
-
-#endif //LGL_IL2CPP_MENU_TOAST_H
+#endif
