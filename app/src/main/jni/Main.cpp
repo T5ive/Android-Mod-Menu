@@ -55,7 +55,7 @@ void (*AddMoneyExample)(void *instance, int amount);
 
 extern "C" {
 JNIEXPORT void JNICALL
-Java_uk_lgl_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
+Java_com_tfive_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
                                         jint feature, jint value, jboolean boolean, jstring str) {
 
     const char *featureName = env->GetStringUTFChars(str, 0);

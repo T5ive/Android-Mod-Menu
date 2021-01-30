@@ -1,7 +1,7 @@
 //TODO
 //Text input string
 
-package uk.lgl.modmenu;
+package com.tfive.modmenu;
 
 import android.animation.ArgbEvaluator;
 import android.animation.TimeAnimator;
@@ -984,7 +984,7 @@ public class FloatingModMenuService extends Service {
                 SeekBarProgressColor = Color.parseColor("#00649F");
                 CheckBoxColor = Color.parseColor("#00649F");
                 RadioColor = Color.parseColor("#00649F");
-                NumberTxt = "#41c300";
+                NumberTxt = "#82CAFD";
 
                 break;
             case 2:

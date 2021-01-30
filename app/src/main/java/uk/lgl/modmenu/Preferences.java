@@ -1,4 +1,4 @@
-package uk.lgl.modmenu;
+package com.tfive.modmenu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
