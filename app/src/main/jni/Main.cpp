@@ -56,15 +56,9 @@ void *hack_thread(void *) {
 
 #if defined(__aarch64__)
     //(hackThread64)
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE_KEY("0x222222", 'g')),
-                                                     OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
+    LOGI(OBFUSCATE("Done"));
 #else
     //(hackThread)
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE_KEY("0x222222", 'g')),
-                                                     OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
-
     LOGI(OBFUSCATE("Done"));
 #endif
 
