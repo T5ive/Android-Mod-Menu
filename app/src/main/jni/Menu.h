@@ -60,6 +60,7 @@ Java_com_tfive_modmenu_FloatingModMenuService_settingsList(JNIEnv *env, jobject 
             OBFUSCATE("-5_Button_Clear logcat"),
             OBFUSCATE("0_Category_Menu"),
             OBFUSCATE("-6_Button_<font color='red'>Close settings</font>"),
+            OBFUSCATE("<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">TFive Tools</marquee></body></html>")
     };
 
     int Total_Feature = (sizeof features /
