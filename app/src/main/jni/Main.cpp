@@ -26,7 +26,7 @@ struct My_Patches {
 
 //NewVariableHere
 
-#define targetLibName OBFUSCATE("(targetLibName)")
+#define targetLibName OBFUSCATE("(yourTargetLibName)")
 
 extern "C" {
 JNIEXPORT void JNICALL
