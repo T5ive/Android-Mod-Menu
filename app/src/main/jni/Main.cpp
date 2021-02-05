@@ -56,7 +56,7 @@ void (*AddMoneyExample)(void *instance, int amount);
 extern "C" {
 JNIEXPORT jobjectArray
 JNICALL
-Java_uk_lgl_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject activityObject) {
+Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject activityObject) {
     jobjectArray ret;
 
     const char *features[] = {
