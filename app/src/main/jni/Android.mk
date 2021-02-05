@@ -5,7 +5,7 @@ include $(CLEAR_VARS)
 # Here is the name of your lib.
 # When you change the lib name, change also on System.loadLibrary("") under OnCreate method on StaticActivity.java
 # Both must have same name
-LOCAL_MODULE    := MyLibName
+LOCAL_MODULE    := TFive
 
 # Code optimization
 # -std=c++17 is required to support AIDE app with NDK
