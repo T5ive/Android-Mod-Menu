@@ -30,7 +30,7 @@ android {
             path file('src/main/jni/Android.mk')
         }
     }
-    ndkVersion = '22.0.7026061'
+    ndkVersion = '21.3.6528147'
     dependencies {
         implementation fileTree(dir: 'libs', include: ['*.jar'])
     }
