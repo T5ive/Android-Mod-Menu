@@ -32,23 +32,23 @@
 
 #endif
 
-// fancy struct for patches for kittyMemory
 struct My_Patches {
-    // let's assume we have patches for these functions for whatever game
-    // like show in miniMap boolean function
-    MemoryPatch GodMode, GodMode2, SliderExample;
-    // etc...
+    MemoryPatch _OneHitKill, _OneHitKill2, _HpHero, _Diamond;
 } hexPatches;
 
-bool feature1 = false, feature2 = false, featureHookToggle = false;
-int sliderValue = 1, dmgmul = 1, defmul = 1, valueFromInput;
-void *instanceBtn;
+bool _oneHitKill = false;
+bool _isAdFree = false;
+int _setGoldValue = 1;
+int _setExpValue = 100;
 
-// Function pointer splitted because we want to avoid crash when the il2cpp lib isn't loaded.
-// If you putted getAbsoluteAddress here, the lib tries to read the address without il2cpp loaded,
-// will result in a null pointer which will cause crash
-// See https://guidedhacking.com/threads/android-function-pointers-hooking-template-tutorial.14771/
-void (*AddMoneyExample)(void *instance, int amount);
+bool _setMP = false;
+int _setMpValue = 100;
+
+void *btnInstance;
+
+void (*SetGold)(void *instance, long amount, bool alwaysTrue);
+void (*SetExp)(void *instance, int amount);
+void (*LvlUp)(void *instance);
 
 //Target lib here
 #define targetLibName OBFUSCATE("libil2cpp.so")
@@ -61,26 +61,15 @@ Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobjec
 
     const char *features[] = {
             OBFUSCATE("0_Category_The Category"),
-            OBFUSCATE("1_Toggle_The toggle"),
-            OBFUSCATE("2_SeekBar_The slider_1_100"),
-            OBFUSCATE("3_SeekBar_Kittymemory slider example_1_5"),
-            OBFUSCATE("4_Spinner_The spinner_Items 1,Items 2,Items 3"),
-            OBFUSCATE("5_Button_The button"),
-            OBFUSCATE("0_ButtonLink_The button with link_https://www.youtube.com/"),
-            OBFUSCATE("6_ButtonOnOff_The On/Off button"),
-            OBFUSCATE("7_CheckBox_The Check Box"),
-            OBFUSCATE("200_InputValue_The input number"),
-            OBFUSCATE("100_RadioButton_Radio buttons_OFF,Mod 1,Mod 2,Mod 3"),
-            OBFUSCATE(
-                    "0_RichTextView_This is text view, not fully HTML."
-                    "<b>Bold</b> <i>italic</i> <u>underline</u>"
-                    "<br />New line <font color='red'>Support colors</font>"),
-            OBFUSCATE(
-                    "0_RichWebView_<html><head><style>body{color: white;}</style></head><body>"
-                    "This is WebView, with REAL HTML support!"
-                    "<div style=\"background-color: darkblue; text-align: center;\">Support CSS</div>"
-                    "<marquee style=\"color: green; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">This is <u>scrollable</u> text</marquee>"
-                    "</body></html>")
+            OBFUSCATE("1_Toggle_1 Hit Kill"), // ใช้ได้แล้ว
+            OBFUSCATE("2_SeekBar_HP_1_3"), // เอาออก ไม่เวิร์ค
+            OBFUSCATE("3_SeekBar_Gold_1000_100000"), // ใช้ได้แล้ว
+            OBFUSCATE("4_Button_Set Gold"),
+            OBFUSCATE("5_Button_Set Exp 100"),
+            OBFUSCATE("6_ButtonOnOff_Ad Free"), // คาดว่าใช้ได้แล้ว
+            OBFUSCATE("7_Button_LevelUp"),
+            OBFUSCATE("8_SeekBar_MP_100_500"), // ใช้ได้แล้ว
+            OBFUSCATE("9_Toggle_MP") // ใช้ได้แล้ว
     };
 
     int Total_Feature = (sizeof features /
@@ -108,209 +97,130 @@ Java_com_tfive_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject ob
     LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d"), feature, featureName, value,
          boolean);
 
-    //!!! BE CAREFUL NOT TO ACCIDENTLY REMOVE break; !!!//
-
     switch (feature) {
         case 1:
-            feature2 = boolean;
-            if (feature2) {
-                // To print bytes you can do this
-                //if (hexPatches.GodMode.Modify()) {
-                //    LOGD(OBFUSCATE("Current Bytes: %s"),
-                //         hexPatches.GodMode.get_CurrBytes().c_str());
-                //}
-                hexPatches.GodMode.Modify();
-                hexPatches.GodMode2.Modify();
+            _oneHitKill = boolean;
+            if (_oneHitKill) {
+                hexPatches._OneHitKill.Modify();
+                hexPatches._OneHitKill2.Modify();
                 LOGI(OBFUSCATE("On"));
             } else {
-                hexPatches.GodMode.Restore();
-                hexPatches.GodMode2.Restore();
+                hexPatches._OneHitKill.Restore();
+                hexPatches._OneHitKill2.Restore();
                 LOGI(OBFUSCATE("Off"));
             }
             break;
-        case 2:
-            if (value >= 1) {
-                sliderValue = value;
-            }
-            break;
         case 3:
-            switch (value) {
-                case 0:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName, string2Offset(
-                                    OBFUSCATE_KEY("0x100000", 't')),
-                            OBFUSCATE(
-                                    "00 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
-                    break;
-                case 1:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName, string2Offset(
-                                    OBFUSCATE_KEY("0x100000",
-                                                  'b')),
-                            OBFUSCATE(
-                                    "01 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
-                    break;
-                case 2:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName,
-                            string2Offset(
-                                    OBFUSCATE_KEY("0x100000",
-                                                  'q')),
-                            OBFUSCATE(
-                                    "02 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
-                    break;
+            if (value >= 1) {
+                 _setGoldValue = value;
             }
             break;
         case 4:
-            switch (value) {
-                case 0:
-                    LOGD(OBFUSCATE("Selected item 1"));
-                    break;
-                case 1:
-                    LOGD(OBFUSCATE("Selected item 2"));
-                    break;
-                case 2:
-                    LOGD(OBFUSCATE("Selected item 3"));
-                    break;
-            }
+            LOGD(OBFUSCATE("Set Gold"));
+            //if (btnInstance != NULL && _setGoldValue > 1){
+                SetGold(btnInstance, (long) _setGoldValue, true);
+                MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
+            //}
             break;
         case 5:
-            LOGD(OBFUSCATE("Feature 5 Called"));
-            // Since we have instanceBtn as a field, we can call it out of Update hook function
-            // See more https://guidedhacking.com/threads/android-function-pointers-hooking-template-tutorial.14771/
-            if (instanceBtn != NULL)
-                AddMoneyExample(instanceBtn, 999999);
-            MakeToast(env, obj, OBFUSCATE("Button pressed"), Toast::LENGTH_SHORT);
+            LOGD(OBFUSCATE("Set Exp"));
+            //if (btnInstance != NULL && _setExpValue > 1){
+                SetExp(btnInstance, _setExpValue);
+                MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
+            //}
             break;
         case 6:
-            LOGD(OBFUSCATE("Feature 6 Called"));
+            _isAdFree = boolean;
             break;
         case 7:
-            LOGD(OBFUSCATE("Feature 7 Called"));
-            featureHookToggle = boolean;
+            LOGD(OBFUSCATE("LevelUp"));
+            //if (btnInstance != NULL){
+                LvlUp(btnInstance);
+                MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
+            //}
             break;
-        case 200:
-            LOGD(OBFUSCATE("Feature 200 Called"));
-            valueFromInput = value;
+        case 8:
+            if (value >= 1) {
+                _setMpValue = value;
+            }
             break;
-        case 100:
-            LOGD(OBFUSCATE("Feature 100 Called"));
+        case 9:
+            _setMP = boolean;
             break;
     }
 }
 }
 
 // ---------- Hooking ---------- //
-
-bool (*old_get_BoolExample)(void *instance);
-
-bool get_BoolExample(void *instance) {
-    if (instance != NULL && featureHookToggle) {
-        return true;
-    }
-    return old_get_BoolExample(instance);
-}
-
-float (*old_get_FloatExample)(void *instance);
-
-float get_FloatExample(void *instance) {
-    if (instance != NULL && sliderValue > 1) {
-        return (float) sliderValue;
-    }
-    return old_get_FloatExample(instance);
-}
-
 void (*old_Update)(void *instance);
-
 void Update(void *instance) {
-    instanceBtn = instance;
+    btnInstance = instance;
     old_Update(instance);
 }
 
-// we will run our patches in a new thread so our while loop doesn't block process main thread
-// Don't forget to remove or comment out logs before you compile it.
+void (*old_LateUpdate)(void *instance);
+void LateUpdate(void *instance) {
+    btnInstance = instance;
+    old_LateUpdate(instance);
+}
 
-//KittyMemory Android Example: https://github.com/MJx0/KittyMemory/blob/master/Android/test/src/main.cpp
-//Note: We use OBFUSCATE_KEY for offsets which is the important part xD
+bool (*old_IsAdFree)(void *instance);
+bool get_IsAdFree(void *instance) {
+    if (instance != NULL && _isAdFree) {
+        return true;
+    }
+    return old_IsAdFree(instance);
+}
+
+int (*old_Mp)(void *instance);
+int UpdateMp(void *instance) {
+    if (instance != NULL && _setMP && _setMpValue > 1) {
+        return _setMpValue*old_Mp(instance);
+    }
+    return old_Mp(instance);
+}
 
 void *hack_thread(void *) {
     LOGI(OBFUSCATE("pthread called"));
-
-    //Check if target lib is loaded
     do {
         sleep(1);
     } while (!isLibraryLoaded(targetLibName));
 
     LOGI(OBFUSCATE("%s has been loaded"), (const char *) targetLibName);
 
-#if defined(__aarch64__) //Compile for arm64 lib only
-    // New way to patch hex via KittyMemory without need to  specify len. Spaces or without spaces are fine
-    hexPatches.GodMode = MemoryPatch::createWithHex(targetLibName,
-                                                    string2Offset(OBFUSCATE_KEY("0x123456", '3')),
-                                                    OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
-    //You can also specify target lib like this
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE_KEY("0x222222", 'g')),
-                                                     OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
+#if defined(__aarch64__)
 
-    // Offset Hook example
-    // A64HookFunction((void *) getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY("0x123456", 'l'))), (void *) get_BoolExample,
-    //                (void **) &old_get_BoolExample);
+#else
+    hexPatches._OneHitKill = MemoryPatch::createWithHex(targetLibName,
+                                                    string2Offset(OBFUSCATE_KEY("0x7E4864", 't')),
+                                                    OBFUSCATE("7F 04 B0 E3 1E FF 2F E1"));
+    hexPatches._OneHitKill2 = MemoryPatch::createWithHex(targetLibName,
+                                                    string2Offset(OBFUSCATE_KEY("0x7E4970", 't')),
+                                                    OBFUSCATE("7F 04 B0 E3 1E FF 2F E1"));
 
-    // Function pointer splitted because we want to avoid crash when the il2cpp lib isn't loaded.
-    // See https://guidedhacking.com/threads/android-function-pointers-hooking-template-tutorial.14771/
-    AddMoneyExample = (void(*)(void *,int))getAbsoluteAddress(targetLibName, 0x123456);
+    hexPatches._Diamond = MemoryPatch::createWithHex(targetLibName,
+                                                        string2Offset(OBFUSCATE_KEY("0xBD5308", 't')),
+                                                        OBFUSCATE("DC 0F 0F E3 1E FF 2F E1"));
+    hexPatches._Diamond.Modify();
 
-#else //Compile for armv7 lib only. Do not worry about greyed out highlighting code, it still works
+    //get_Available
+    MSHookFunction((void *) getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY("0x7E445C", '?'))),
+                       (void *) get_IsAdFree, (void **) &old_IsAdFree);
+    //get_Hp
+    MSHookFunction((void *) getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY("0x7E4704", '?'))),
+                   (void *) UpdateMp, (void **) &old_Mp);
 
-    // New way to patch hex via KittyMemory without need to specify len. Spaces or without spaces are fine
-    hexPatches.GodMode = MemoryPatch::createWithHex(targetLibName,
-                                                    string2Offset(OBFUSCATE_KEY("0x123456", '-')),
-                                                    OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
-    //You can also specify target lib like this
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE_KEY("0x222222", 'g')),
-                                                     OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
-    //Apply patches here if you don't use mod menu
-    //hexPatches.GodMode.Modify();
-    //hexPatches.GodMode2.Modify();
-
-    // Offset Hook example
-    //MSHookFunction((void *) getAbsoluteAddress(targetLibName,
-    //               string2Offset(OBFUSCATE_KEY("0x123456", '?'))),
-    //               (void *) get_BoolExample, (void **) &old_get_BoolExample);
-
-    // Symbol hook example (untested). Symbol/function names can be found in IDA if the lib are not stripped. This is not for il2cpp games
-    //MSHookFunction((void *) ("__SymbolNameExample"), (void *) get_BoolExample, (void **) &old_get_BoolExample);
-
-    // Function pointer splitted because we want to avoid crash when the il2cpp lib isn't loaded.
-    // See https://guidedhacking.com/threads/android-function-pointers-hooking-template-tutorial.14771/
-    AddMoneyExample = (void (*)(void *, int)) getAbsoluteAddress(targetLibName, 0x123456);
-
+    SetGold = (void (*)(void *, long, bool)) getAbsoluteAddress(targetLibName, 0xBD4B6C);
+    SetExp = (void (*)(void *, int)) getAbsoluteAddress(targetLibName, 0xBD4370);
+    LvlUp = (void (*)(void *)) getAbsoluteAddress(targetLibName, 0xBD5488);
     LOGI(OBFUSCATE("Done"));
 #endif
 
     return NULL;
 }
 
-//No need to use JNI_OnLoad, since we don't use JNIEnv
-//We do this to hide OnLoad from disassembler
 __attribute__((constructor))
 void lib_main() {
-    // Create a new thread so it does not block the main thread, means the game would not freeze
     pthread_t ptid;
     pthread_create(&ptid, NULL, hack_thread, NULL);
 }
-
-/*
-JNIEXPORT jint JNICALL
-JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *globalEnv;
-    vm->GetEnv((void **) &globalEnv, JNI_VERSION_1_6);
-
-    return JNI_VERSION_1_6;
-}
- */
