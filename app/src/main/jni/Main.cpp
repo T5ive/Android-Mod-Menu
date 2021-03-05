@@ -21,7 +21,7 @@
 #include "Includes/Logger.h"
 #include "Includes/Utils.h"
 #include "Menu.h"
-#include "Toast.h"
+
 
 #if defined(__aarch64__) //Compile for arm64 lib only
 #include <And64InlineHook/And64InlineHook.hpp>
@@ -29,6 +29,7 @@
 
 #include <Substrate/SubstrateHook.h>
 #include <Substrate/CydiaSubstrate.h>
+#include <iostream>
 
 #endif
 
@@ -54,31 +55,68 @@ void (*LvlUp)(void *instance);
 #define targetLibName OBFUSCATE("libil2cpp.so")
 
 extern "C" {
+JNIEXPORT void JNICALL
+Java_uk_lgl_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
+    MakeToast(env, context, OBFUSCATE("Modded by TFive"), Toast::LENGTH_LONG);
+}
+
+// Note:
+// Do not change or translate the first text unless you know what you are doing
+// Assigning feature numbers is optional. Without it, it will automatically count for you, starting from 0
+// Assigned feature numbers can be like any numbers 1,3,200,10... instead in order 0,1,2,3,4,5...
+// ButtonLink, Category, RichTextView and RichWebView is not counted. They can't have feature number assigned
+// To learn HTML, go to this page: https://www.w3schools.com/
+
+// Usage:
+// (Optional feature number)_Toggle_(feature name)
+// (Optional feature number)_SeekBar_(feature name)_(min value)_(max value)
+// (Optional feature number)_Spinner_(feature name)_(Items e.g. item1,item2,item3)
+// (Optional feature number)_Button_(feature name)
+// (Optional feature number)_ButtonOnOff_(feature name)
+// (Optional feature number)_InputValue_(feature name)
+// (Optional feature number)_CheckBox_(feature name)
+// (Optional feature number)_RadioButton_(feature name)_(Items e.g. radio1,radio2,radio3)
+// RichTextView_(Text with limited HTML support)
+// RichWebView_(Full HTML support)
+// ButtonLink_(feature name)_(URL/Link here)
+// Category_(text)
+
+// Few examples:
+// 10_Toggle_Jump hack
+// 100_Toggle_Ammo hack
+// Toggle_Ammo hack
+// 1_Spinner_Weapons_AK47,9mm,Knife
+// Spinner_Weapons_AK47,9mm,Knife
+// 2_ButtonOnOff_God mode
+// Category_Hello world
+
+extern "C" {
 JNIEXPORT jobjectArray
 JNICALL
 Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject activityObject) {
     jobjectArray ret;
 
     const char *features[] = {
-            OBFUSCATE("0_Category_The Category"),
-            OBFUSCATE("1_Toggle_1 Hit Kill"), // ใช้ได้แล้ว
-            OBFUSCATE("2_SeekBar_HP_1_3"), // เอาออก ไม่เวิร์ค
-            OBFUSCATE("3_SeekBar_Gold_1000_100000"), // ใช้ได้แล้ว
-            OBFUSCATE("4_Button_Set Gold"),
-            OBFUSCATE("5_Button_Set Exp 100"),
-            OBFUSCATE("6_ButtonOnOff_Ad Free"), // คาดว่าใช้ได้แล้ว
-            OBFUSCATE("7_Button_LevelUp"),
-            OBFUSCATE("8_SeekBar_MP_100_500"), // ใช้ได้แล้ว
-            OBFUSCATE("9_Toggle_MP") // ใช้ได้แล้ว
+            OBFUSCATE("Category_The Category"), // ไม่นับ
+            OBFUSCATE("Toggle_1 Hit Kill"), // 0
+            OBFUSCATE("100_Toggle_Super God Mode"), // 100
+            OBFUSCATE("SeekBar_HP_1_3"), // 1
+            OBFUSCATE("SeekBar_Gold_1000_100000"), // 2
+            OBFUSCATE("Button_Set Gold"), // 3
+            OBFUSCATE("Button_Set Exp 100"), // 4
+            OBFUSCATE("ButtonOnOff_Ad Free"), // 5
+            OBFUSCATE("Button_LevelUp"), // 6
+            OBFUSCATE("SeekBar_MP_100_500"), // 7
+            OBFUSCATE("Toggle_MP") // 8
     };
 
-    int Total_Feature = (sizeof features /
-                         sizeof features[0]); //Now you dont have to manually update the number everytime;
+    //Now you dont have to manually update the number everytime;
+    int Total_Feature = (sizeof features / sizeof features[0]);
     ret = (jobjectArray)
             env->NewObjectArray(Total_Feature, env->FindClass(OBFUSCATE("java/lang/String")),
                                 env->NewStringUTF(""));
-    int i;
-    for (i = 0; i < Total_Feature; i++)
+
+    for (int i = 0; i < Total_Feature; i++)
         env->SetObjectArrayElement(ret, i, env->NewStringUTF(features[i]));
 
     pthread_t ptid;
@@ -90,61 +128,70 @@ Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobjec
 
 JNIEXPORT void JNICALL
 Java_com_tfive_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
-                                        jint feature, jint value, jboolean boolean, jstring str) {
+                                        jint featNum, jstring featName, jint value,
+                                        jboolean boolean, jstring str) {
+    //Convert java string to c++
+    const char *featureName = env->GetStringUTFChars(featName, 0);
+    const char *TextInput;
+    if (str != NULL)
+        TextInput = env->GetStringUTFChars(str, 0);
+    else
+        TextInput = "Empty";
 
-    const char *featureName = env->GetStringUTFChars(str, 0);
+    LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d | Text: = %s"), featNum,
+        featureName, value,
+        boolean, TextInput);
 
-    LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d"), feature, featureName, value,
-         boolean);
+    //BE CAREFUL NOT TO ACCIDENTLY REMOVE break;
 
-    switch (feature) {
-        case 1:
+    switch (featNum) {
+        case 0:
             _oneHitKill = boolean;
             if (_oneHitKill) {
                 hexPatches._OneHitKill.Modify();
                 hexPatches._OneHitKill2.Modify();
-                LOGI(OBFUSCATE("On"));
+                //LOGI(OBFUSCATE("On"));
             } else {
                 hexPatches._OneHitKill.Restore();
                 hexPatches._OneHitKill2.Restore();
-                LOGI(OBFUSCATE("Off"));
+                //LOGI(OBFUSCATE("Off"));
             }
             break;
-        case 3:
+        case 2:
             if (value >= 1) {
                  _setGoldValue = value;
             }
             break;
-        case 4:
+        case 3:
             LOGD(OBFUSCATE("Set Gold"));
             //if (btnInstance != NULL && _setGoldValue > 1){
                 SetGold(btnInstance, (long) _setGoldValue, true);
                 MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
             //}
             break;
-        case 5:
+        case 4:
             LOGD(OBFUSCATE("Set Exp"));
             //if (btnInstance != NULL && _setExpValue > 1){
                 SetExp(btnInstance, _setExpValue);
                 MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
             //}
             break;
-        case 6:
+        case 5:
             _isAdFree = boolean;
             break;
-        case 7:
+        case 6:
             LOGD(OBFUSCATE("LevelUp"));
             //if (btnInstance != NULL){
                 LvlUp(btnInstance);
                 MakeToast(env, obj, OBFUSCATE("Done"), Toast::LENGTH_SHORT);
             //}
             break;
-        case 8:
+        case 7:
             if (value >= 1) {
                 _setMpValue = value;
             }
             break;
-        case 9:
+        case 8:
             _setMP = boolean;
             break;
     }
