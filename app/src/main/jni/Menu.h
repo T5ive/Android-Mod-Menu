@@ -49,17 +49,17 @@ Java_com_tfive_modmenu_FloatingModMenuService_settingsList(JNIEnv *env, jobject 
     jobjectArray ret;
 
     const char *features[] = {
-            OBFUSCATE("0_Category_Settings"),
+            OBFUSCATE("Category_Settings"),
             OBFUSCATE("-1_Toggle_Color animation"),
             OBFUSCATE("-2_Toggle_Auto size vertically"),
             OBFUSCATE("-3_Toggle_Save feature preferences (Radio Button is not saved)"),
-            OBFUSCATE("0_Category_Logcat"),
-            OBFUSCATE("0_RichTextView_Save logcat if a bug occured and sent it to the modder. Clear logcat and reproduce bug again if the log file is too large"),
-            OBFUSCATE("0_RichTextView_<small>Saving logcat does not need file permission. Logcat location:<br/>Android 11: /storage/emulated/0/Documents/Mod Menu logs/"
+            OBFUSCATE("Category_Logcat"),
+            OBFUSCATE("RichTextView_Save logcat if a bug occured and sent it to the modder. Clear logcat and reproduce bug again if the log file is too large"),
+            OBFUSCATE("RichTextView_<small>Saving logcat does not need file permission. Logcat location:<br/>Android 11: /storage/emulated/0/Documents/Mod Menu logs/"
                       "<br/>Android 10 and below: /storage/emulated/0/Android/data/(package name)/files/Mod Menu logs</small>"),
             OBFUSCATE("-4_Button_Save logcat to file"),
             OBFUSCATE("-5_Button_Clear logcat"),
-            OBFUSCATE("0_Category_Menu"),
+            OBFUSCATE("Category_Menu"),
             OBFUSCATE("-6_Button_<font color='red'>Close settings</font>"),
             //(TFiveEndCredit)
     };
