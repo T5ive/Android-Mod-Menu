@@ -91,7 +91,7 @@ DWORD getAbsoluteAddress(const char *libraryName, DWORD relativeAddr) {
 
 extern "C" {
 JNIEXPORT jboolean JNICALL
-Java_uk_lgl_modmenu_FloatingModMenuService_isGameLibLoaded(JNIEnv *env, jobject thiz) {
+Java_com_tfive_modmenu_FloatingModMenuService_isGameLibLoaded(JNIEnv *env, jobject thiz) {
     return isGameLibLoaded;
 }
 }

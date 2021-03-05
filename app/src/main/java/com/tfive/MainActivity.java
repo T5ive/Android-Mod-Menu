@@ -1,4 +1,4 @@
-package uk.lgl;
+package com.tfive;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,9 +11,9 @@ import android.os.Process;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import uk.lgl.modmenu.FloatingModMenuService;
+import com.tfive.modmenu.FloatingModMenuService;
 
-import static uk.lgl.modmenu.Preferences.context;
+import static com.tfive.modmenu.Preferences.context;
 
 public class MainActivity extends Activity {
 
