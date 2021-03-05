@@ -90,7 +90,6 @@ Java_uk_lgl_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
 // 2_ButtonOnOff_God mode
 // Category_Hello world
 
-extern "C" {
 JNIEXPORT jobjectArray
 JNICALL
 Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject activityObject) {
