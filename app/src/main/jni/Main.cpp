@@ -46,7 +46,7 @@ Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobjec
 
     const char *features[] = {//(yourFeaturesList)
             OBFUSCATE(
-                    "0_RichWebView_<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">"
+                    "RichWebView_<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">"
                     "(yourEndCredit)"
                     "</marquee></body></html>")
     };
