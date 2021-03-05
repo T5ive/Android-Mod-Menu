@@ -56,7 +56,7 @@ void (*LvlUp)(void *instance);
 
 extern "C" {
 JNIEXPORT void JNICALL
-Java_uk_lgl_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
+Java_com_tfive_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
     MakeToast(env, context, OBFUSCATE("Modded by TFive"), Toast::LENGTH_LONG);
 }
 
