@@ -531,6 +531,45 @@ public class FloatingModMenuService extends Service {
         return linearLayout;
     }
 
+    private View SeekBarSwitch(final int featureNum, final String featureName, final int min, int max) {
+        int loadedProg = Preferences.loadPrefInt(featureName, featureNum);
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setPadding(10, 5, 0, 5);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setGravity(Gravity.CENTER);
+
+        final TextView textView = new TextView(this);
+        textView.setText(Html.fromHtml("<font face='roboto'>" + featureName + ": <font color='" + NumberTxtColor + "'>" + ((loadedProg == 0) ? min : loadedProg) + "</font>"));
+        textView.setTextColor(TEXT_COLOR_2);
+
+        SeekBar seekBar = new SeekBar(this);
+        seekBar.setPadding(25, 10, 35, 10);
+        seekBar.setMax(max);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            seekBar.setMin(min); //setMin for Oreo and above
+        seekBar.setProgress((loadedProg == 0) ? min : loadedProg);
+        seekBar.getThumb().setColorFilter(SeekBarColor, PorterDuff.Mode.SRC_ATOP);
+        seekBar.getProgressDrawable().setColorFilter(SeekBarProgressColor, PorterDuff.Mode.SRC_ATOP);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onProgressChanged(SeekBar seekBar, int i, boolean z) {
+                //if progress is greater than minimum, don't go below. Else, set progress
+                seekBar.setProgress(i < min ? min : i);
+                Preferences.changeFeatureInt(featureName, featureNum, i < min ? min : i);
+                textView.setText(Html.fromHtml("<font face='roboto'>" + featureName + ": <font color='" + NumberTxtColor + "'>" + (i < min ? min : i) + "</font>"));
+            }
+        });
+        linearLayout.addView(textView);
+        linearLayout.addView(seekBar);
+
+        return linearLayout;
+    }
+
     private View Button(final int featureNum, final String featureName) {
         final Button button = new Button(this);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT);
