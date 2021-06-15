@@ -70,7 +70,7 @@ Java_com_tfive_modmenu_FloatingModMenuService_IconWebViewData(JNIEnv *env, jobje
     // To disable it, return NULL. It will use normal image above:
     // return NULL
 
-    return env->NewStringUTF(OBFUSCATE_KEY("https://i.imgur.com/qfKEHya.png", 'u'));
+    return env->NewStringUTF(OBFUSCATE("https://i.imgur.com/qfKEHya.png"));
     return NULL;
 }
 

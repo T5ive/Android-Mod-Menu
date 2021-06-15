@@ -1061,7 +1061,6 @@ public class FloatingModMenuService extends Service {
                 BTN_COLOR = Color.parseColor("#00649F");
                 MENU_BG_COLOR = Color.parseColor("#252E3B");
                 MENU_FEATURE_BG_COLOR = Color.parseColor("#FF171E24");
-                HintTxtColor = Color.parseColor("#434d52");
                 ToggleON = Color.parseColor("#0066FF");
                 ToggleOFF = Color.parseColor("#00649F");
                 BtnON = Color.parseColor("#0066CC");
@@ -1079,7 +1078,6 @@ public class FloatingModMenuService extends Service {
                 BTN_COLOR = Color.parseColor("#1C262D");
                 MENU_BG_COLOR = Color.parseColor("#DD1C2A35"); //#AARRGGBB
                 MENU_FEATURE_BG_COLOR = Color.parseColor("#FF171E24"); //#AARRGGBB
-                HintTxtColor = Color.parseColor("#434d52");
                 ToggleON = Color.parseColor("#0066FF");
                 ToggleOFF = Color.parseColor("#00649F");
                 CategoryBG =  Color.parseColor("#2F3D4C");
