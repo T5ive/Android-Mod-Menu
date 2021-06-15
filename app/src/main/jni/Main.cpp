@@ -6,21 +6,18 @@
 #include <jni.h>
 #include <unistd.h>
 #include <fstream>
-#include "Includes/obfuscate.h"
-#include "KittyMemory/MemoryPatch.h"
+#include <iostream>
 #include "Includes/Logger.h"
+#include "Includes/obfuscate.h"
 #include "Includes/Utils.h"
+#include "KittyMemory/MemoryPatch.h"
 #include "Menu.h"
-
 
 #if defined(__aarch64__)
 #include <And64InlineHook/And64InlineHook.hpp>
 #else
-
 #include <Substrate/SubstrateHook.h>
 #include <Substrate/CydiaSubstrate.h>
-#include <iostream>
-
 #endif
 
 struct My_Patches {
@@ -29,26 +26,41 @@ struct My_Patches {
 
 //NewVariableHere
 
+
 //NewMethodHere
 
 #define targetLibName OBFUSCATE("(yourTargetLibName)")
 
-extern "C" {
-JNIEXPORT void JNICALL
-Java_com_tfive_MainActivity_Toast(JNIEnv *env, jclass obj, jobject context) {
-    //ToastHere
+void *hack_thread(void *) {
+    LOGI(OBFUSCATE("pthread created"));
+    do {
+        sleep(1);
+    } while (!isLibraryLoaded(targetLibName));
+
+    LOGI(OBFUSCATE("%s has been loaded"), (const char *) targetLibName);
+
+#if defined(__aarch64__)
+    //(hackThread64)
+#else
+    //(hackThread)
+#endif
+
+    return NULL;
 }
+
+extern "C" {
 
 JNIEXPORT jobjectArray
 JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject activityObject) {
+Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject context) {
     jobjectArray ret;
 
+    //ToastHere
+
     const char *features[] = {//(yourFeaturesList)
-            OBFUSCATE(
-                    "RichWebView_<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">"
-                    "(yourEndCredit)"
-                    "</marquee></body></html>")
+            OBFUSCATE("RichWebView_<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">"
+                      "(yourEndCredit)"
+                      "</marquee></body></html>")
     };
 
     int Total_Feature = (sizeof features / sizeof features[0]);
@@ -65,46 +77,19 @@ Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobjec
     return (ret);
 }
 
-
 JNIEXPORT void JNICALL
 Java_com_tfive_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
                                         jint featNum, jstring featName, jint value,
                                         jboolean boolean, jstring str) {
-    //Convert java string to c++
-    const char *featureName = env->GetStringUTFChars(featName, 0);
-    const char *TextInput;
-    if (str != NULL)
-        TextInput = env->GetStringUTFChars(str, 0);
-    else
-        TextInput = "Empty";
 
     LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d | Text: = %s"), featNum,
-        featureName, value,
-        boolean, TextInput);
-
-    //BE CAREFUL NOT TO ACCIDENTLY REMOVE break;
+         env->GetStringUTFChars(featName, 0), value,
+         boolean, str != NULL ? env->GetStringUTFChars(str, 0) : "");
 
     switch (featNum) {
         //(yourFeatures)
     }
 }
-}
-
-void *hack_thread(void *) {
-    LOGI(OBFUSCATE("pthread called"));
-    do {
-        sleep(1);
-    } while (!isLibraryLoaded(targetLibName));
-
-    LOGI(OBFUSCATE("%s has been loaded"), (const char *) targetLibName);
-
-#if defined(__aarch64__)
-    //(hackThread64)
-#else
-    //(hackThread)
-#endif
-
-    return NULL;
 }
 
 __attribute__((constructor))
