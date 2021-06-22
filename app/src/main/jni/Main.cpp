@@ -214,6 +214,7 @@ Java_com_tfive_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobjec
             OBFUSCATE("CollapseAdd_InputValue_Input number"),
             OBFUSCATE("SeekBarSwitch_Seekbar_1_100"),
             OBFUSCATE("InputOnOff_500_Test Input Vales"),
+            OBFUSCATE("InputButton_5000_Test Input Button"),
             OBFUSCATE("RichTextView_This is text view, not fully HTML."
                       "<b>Bold</b> <i>italic</i> <u>underline</u>"
                       "<br />New line <font color='red'>Support colors</font>"
