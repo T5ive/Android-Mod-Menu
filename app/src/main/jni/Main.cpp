@@ -13,11 +13,15 @@
 #include "KittyMemory/MemoryPatch.h"
 #include "Menu.h"
 
+#define targetLibName OBFUSCATE("(yourTargetLibName)")
+
 #if defined(__aarch64__)
 #include <And64InlineHook/And64InlineHook.hpp>
+#define HOOK(offset, key, ptr, orig) A64HookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, key))), (void *)ptr, (void **)&orig)
 #else
 #include <Substrate/SubstrateHook.h>
 #include <Substrate/CydiaSubstrate.h>
+#define HOOK(offset, key, ptr, orig) MSHookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, key))), (void *)ptr, (void **)&orig)
 #endif
 
 struct My_Patches {
@@ -28,8 +32,6 @@ struct My_Patches {
 
 
 //NewMethodHere
-
-#define targetLibName OBFUSCATE("(yourTargetLibName)")
 
 void *hack_thread(void *) {
     LOGI(OBFUSCATE("pthread created"));
