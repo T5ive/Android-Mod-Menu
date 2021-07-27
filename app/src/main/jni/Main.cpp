@@ -13,12 +13,19 @@
 #include "KittyMemory/MemoryPatch.h"
 #include "Menu.h"
 
+//Target lib here
+#define targetLibName OBFUSCATE("libil2cpp.so")
+
 #if defined(__aarch64__) //Compile for arm64 lib only
+
 #include <And64InlineHook/And64InlineHook.hpp>
+#define HOOK(offset, ptr, orig) A64HookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, 23479432523588))), (void *)ptr, (void **)&orig)
+
 #else //Compile for armv7 lib only. Do not worry about greyed out highlighting code, it still works
 
 #include <Substrate/SubstrateHook.h>
 #include <Substrate/CydiaSubstrate.h>
+#define HOOK(offset, ptr, orig) MSHookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, 23479432523588))), (void *)ptr, (void **)&orig)
 
 #endif
 
@@ -87,9 +94,6 @@ void HealthUpdate(void *instance) {
     return old_HealthUpdate(instance);
 }
 
-//Target lib here
-#define targetLibName OBFUSCATE("libil2cpp.so")
-
 // we will run our hacks in a new thread so our while loop doesn't block process main thread
 void *hack_thread(void *) {
     LOGI(OBFUSCATE("pthread created"));
@@ -121,6 +125,11 @@ void *hack_thread(void *) {
                                                      OBFUSCATE("20 00 80 D2 C0 03 5F D6"));
 
     // Offset Hook example
+
+    // HOOK macro armv7/arm64 support
+    // HOOK("0x123456", get_BoolExample, old_get_BoolExample);
+    // HOOK("0x123456", Level, old_Level);
+
     //A64HookFunction((void *) getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY("0x123456", 23479432523588))), (void *) get_BoolExample,
     //                (void **) &old_get_BoolExample);
 
@@ -146,6 +155,11 @@ void *hack_thread(void *) {
     //hexPatches.GodMode2.Modify();
 
     // Offset Hook example
+
+    // HOOK macro armv7/arm64 support
+    // HOOK("0x123456", get_BoolExample, old_get_BoolExample);
+    // HOOK("0x123456", Level, old_Level);
+
     //MSHookFunction((void *) getAbsoluteAddress(targetLibName,
     //               string2Offset(OBFUSCATE_KEY("0x123456", '?'))),
     //               (void *) get_BoolExample, (void **) &old_get_BoolExample);
@@ -154,6 +168,7 @@ void *hack_thread(void *) {
     //               (void *) Level, (void **) &old_Level);
 
     // Symbol hook example (untested). Symbol/function names can be found in IDA if the lib are not stripped. This is not for il2cpp games
+    // HOOK(("__SymbolNameExample"), get_BoolExample, old_get_BoolExample);
     //MSHookFunction((void *) ("__SymbolNameExample"), (void *) get_BoolExample, (void **) &old_get_BoolExample);
 
     // Function pointer splitted because we want to avoid crash when the il2cpp lib isn't loaded.
