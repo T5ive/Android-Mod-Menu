@@ -30,7 +30,6 @@ struct My_Patches {
 
 //NewVariableHere
 
-
 //NewMethodHere
 
 void *hack_thread(void *) {
