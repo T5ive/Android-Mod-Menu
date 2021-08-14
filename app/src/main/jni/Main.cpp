@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <iostream>
+#include <dlfcn.h>
 #include "Includes/Logger.h"
 #include "Includes/obfuscate.h"
 #include "Includes/Utils.h"
@@ -14,15 +15,7 @@
 #include "Menu.h"
 
 #define targetLibName OBFUSCATE("(yourTargetLibName)")
-
-#if defined(__aarch64__)
-#include <And64InlineHook/And64InlineHook.hpp>
-#define HOOK(offset, key, ptr, orig) A64HookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, key))), (void *)ptr, (void **)&orig)
-#else
-#include <Substrate/SubstrateHook.h>
-#include <Substrate/CydiaSubstrate.h>
-#define HOOK(offset, key, ptr, orig) MSHookFunction((void *)getAbsoluteAddress(targetLibName, string2Offset(OBFUSCATE_KEY(offset, key))), (void *)ptr, (void **)&orig)
-#endif
+#include "Includes/Macros.h"
 
 struct My_Patches {
     //VariableHere
