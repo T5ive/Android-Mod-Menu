@@ -1,6 +1,7 @@
-#ifndef DAWN_LOGGER_H
-#define DAWN_LOGGER_H
+#ifndef Logger_h
+#define Logger_h
 
+#include <jni.h>
 #include <android/log.h>
 
 enum daLogType {
@@ -18,4 +19,4 @@ enum daLogType {
 #define LOGI(...) ((void)__android_log_print(daINFO,  TAG, __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(daWARN,  TAG, __VA_ARGS__))
 
-#endif //DAWN_LOGGER_H
+#endif /* Logger_h */

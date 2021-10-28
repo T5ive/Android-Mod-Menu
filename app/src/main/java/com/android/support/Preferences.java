@@ -1,16 +1,12 @@
-package com.tfive.modmenu;
+package com.android.support;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.os.Build;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class Preferences {
     private static SharedPreferences sharedPreferences;
@@ -41,12 +37,6 @@ public class Preferences {
     public static void changeFeatureBool(String featureName, int featureNum, boolean bool) {
         Preferences.with(context).writeBoolean(featureNum, bool);
         Changes(context, featureNum, featureName, 0, bool, null);
-    }
-
-    public static void changeFeatureBoolInt(String featureName, int featureNum, boolean bool, int value) {
-        Preferences.with(context).writeBoolean(featureNum, bool);
-        Preferences.with(context).writeInt(featureNum, value);
-        Changes(context, featureNum, featureName, value, bool, null);
     }
 
     public static int loadPrefInt(String featureName, int featureNum) {

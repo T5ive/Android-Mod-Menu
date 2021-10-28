@@ -1,4 +1,4 @@
-package com.tfive;
+package com.android.support;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,6 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import com.tfive.modmenu.FloatingModMenuService;
-
 public class MainActivity extends Activity {
 
     //Only if you have changed MainActivity to yours and you wanna call game's activity.
@@ -22,7 +20,7 @@ public class MainActivity extends Activity {
     static {
         // When you change the lib name, change also on Android.mk file
         // Both must have same name
-        System.loadLibrary("TFive");
+        System.loadLibrary("MyLibName");
     }
 
     //To call onCreate, please refer to README.md
@@ -38,13 +36,12 @@ public class MainActivity extends Activity {
         if (!hasLaunched) {
             try {
                 //Start service
-                //MainActivity.this.startActivity(new Intent(MainActivity.this, Class.forName(MainActivity.this.GameActivity)));
                 MainActivity.this.startActivity(new Intent(MainActivity.this, Class.forName(MainActivity.this.GameActivity)));
                 hasLaunched = true;
             } catch (ClassNotFoundException e) {
                 //Uncomment this if you are following METHOD 2 of CHANGING FILES
                 //Toast.makeText(MainActivity.this, "Error. Game's main activity does not exist", Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+                //e.printStackTrace();
                 return;
             }
         }
@@ -70,7 +67,7 @@ public class MainActivity extends Activity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    context.startService(new Intent(context, FloatingModMenuService.class));
+                    context.startService(new Intent(context, Menu.class));
                 }
             }, 500);
         }
