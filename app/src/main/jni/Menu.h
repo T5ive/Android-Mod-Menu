@@ -1,15 +1,5 @@
 bool titleValid, headingValid, iconValid, settingsValid, isLeeched;
 
-void *antiLeech(void *) {
-    sleep(20);
-
-    if (!titleValid || !headingValid || !iconValid || !settingsValid) {
-        int *p = 0;
-        *p = 0;
-    }
-    return NULL;
-}
-
 void setText(JNIEnv *env, jobject obj, const char* text){
     jclass html = (*env).FindClass(OBFUSCATE("android/text/Html"));
     jmethodID fromHtml = (*env).GetStaticMethodID(html, OBFUSCATE("fromHtml"), OBFUSCATE("(Ljava/lang/String;)Landroid/text/Spanned;"));
@@ -23,16 +13,13 @@ void setText(JNIEnv *env, jobject obj, const char* text){
     (*env).CallVoidMethod(obj, setText,  (*env).CallStaticObjectMethod(html, fromHtml, jstr));
 }
 
-extern "C" {
-JNIEXPORT void JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_setTitleText(JNIEnv *env, jobject thiz, jobject obj) {
+void setTitleText(JNIEnv *env, jobject thiz, jobject obj) {
     setText(env, obj, OBFUSCATE("<b>Modded by (yourName)</b>"));
 
     titleValid = true;
 }
 
-JNIEXPORT void JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_setHeadingText(JNIEnv *env, jobject thiz, jobject obj) {
+void setHeadingText(JNIEnv *env, jobject thiz, jobject obj) {
     setText(env, obj, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
                                       "<p style=\"color:green;\">Modded by (yourName)</p> | "
                                       "(yourSite) | (yourText)</p>"
@@ -41,22 +28,19 @@ Java_com_tfive_modmenu_FloatingModMenuService_setHeadingText(JNIEnv *env, jobjec
     headingValid = true;
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_Icon(JNIEnv *env, jobject thiz) {
+jstring Icon(JNIEnv *env, jobject thiz) {
     iconValid = true;
 
     return env->NewStringUTF(
             OBFUSCATE("(yourImage)"));
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_IconWebViewData(JNIEnv *env, jobject thiz) {
+jstring IconWebViewData(JNIEnv *env, jobject thiz) {
     iconValid = true;
     return NULL;
 }
 
-JNIEXPORT jobjectArray JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_settingsList(JNIEnv *env, jobject activityObject) {
+jobjectArray settingsList(JNIEnv *env, jobject activityObject) {
     jobjectArray ret;
 
     const char *features[] = {
@@ -87,5 +71,4 @@ Java_com_tfive_modmenu_FloatingModMenuService_settingsList(JNIEnv *env, jobject 
     settingsValid = true;
 
     return (ret);
-}
 }

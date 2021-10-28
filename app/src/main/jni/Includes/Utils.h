@@ -12,7 +12,7 @@
 typedef unsigned long DWORD;
 static uintptr_t libBase;
 
-bool isGameLibLoaded = false;
+bool libLoaded = false;
 
 DWORD findLibrary(const char *library) {
     char filename[0xFF] = {0},
@@ -51,22 +51,19 @@ DWORD getAbsoluteAddress(const char *libraryName, DWORD relativeAddr) {
     return (reinterpret_cast<DWORD>(libBase + relativeAddr));
 }
 
-extern "C" {
-JNIEXPORT jboolean JNICALL
-Java_com_tfive_modmenu_FloatingModMenuService_isGameLibLoaded(JNIEnv *env, jobject thiz) {
-    return isGameLibLoaded;
-}
+jboolean isGameLibLoaded(JNIEnv *env, jobject thiz) {
+    return libLoaded;
 }
 
 bool isLibraryLoaded(const char *libraryName) {
-    //isGameLibLoaded = true;
+    //libLoaded = true;
     char line[512] = {0};
     FILE *fp = fopen(OBFUSCATE("/proc/self/maps"), OBFUSCATE("rt"));
     if (fp != NULL) {
         while (fgets(line, sizeof(line), fp)) {
             std::string a = line;
             if (strstr(line, libraryName)) {
-                isGameLibLoaded = true;
+                libLoaded = true;
                 return true;
             }
         }
