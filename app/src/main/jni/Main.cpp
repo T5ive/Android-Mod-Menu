@@ -39,7 +39,6 @@ void *hack_thread(void *) {
     //(hackThread)
 #endif
 
-    // Anti Leech
     sleep(20);
     if (!titleValid || !headingValid || !iconValid || !settingsValid) {
         int *p = 0;
@@ -48,8 +47,6 @@ void *hack_thread(void *) {
 
     return NULL;
 }
-
-/// -------------------------------------------------------------------- ///
 
 jobjectArray getFeatureList(JNIEnv *env, jobject context) {
     jobjectArray ret;
@@ -97,11 +94,6 @@ JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *globalEnv;
     vm->GetEnv((void **) &globalEnv, JNI_VERSION_1_6);
-    // Register your class native methods. Build and ecompile the app and see the signature
-        // This is to hide function names from disassembler
-        // See more: https://developer.android.com/training/articles/perf-jni#native-libraries
-
-        //Your menu class
         jclass c = globalEnv->FindClass("com/android/support/Menu");
         if (c != nullptr){
             static const JNINativeMethod menuMethods[] = {
