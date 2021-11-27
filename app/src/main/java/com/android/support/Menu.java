@@ -1440,38 +1440,21 @@ public class Menu extends Service {
     private void ChangeTheme(int num) {
         switch (num) {
             case 1:
-                TEXT_COLOR = Color.parseColor("#82CAFD");
-                TEXT_COLOR_2 = Color.parseColor("#FFFFFF");
-                BTN_COLOR = Color.parseColor("#00649F");
-                MENU_BG_COLOR = Color.parseColor("#252E3B");
-                MENU_FEATURE_BG_COLOR = Color.parseColor("#FF171E24");
-                ToggleON = Color.parseColor("#0066FF");
-                ToggleOFF = Color.parseColor("#00649F");
-                BtnON = Color.parseColor("#0066CC");
-                BtnOFF = Color.parseColor("#1A2028");
-                CategoryBG =  Color.parseColor("#2F3D4C");
-                SeekBarColor = Color.parseColor("#00649F");
-                SeekBarProgressColor = Color.parseColor("#00649F");
-                CheckBoxColor = Color.parseColor("#00649F");
-                RadioColor = Color.parseColor("#00649F");
-                NumberTxtColor = "#82CAFD";
-                break;
-            case 2:
-                TEXT_COLOR = Color.parseColor("#82CAFD");
-                TEXT_COLOR_2 = Color.parseColor("#FFFFFF");
-                BTN_COLOR = Color.parseColor("#1C262D");
-                MENU_BG_COLOR = Color.parseColor("#DD1C2A35"); //#AARRGGBB
-                MENU_FEATURE_BG_COLOR = Color.parseColor("#FF171E24"); //#AARRGGBB
-                ToggleON = Color.parseColor("#0066FF");
-                ToggleOFF = Color.parseColor("#00649F");
-                CategoryBG =  Color.parseColor("#2F3D4C");
-                SeekBarColor = Color.parseColor("#80CBC4");
-                SeekBarProgressColor = Color.parseColor("#80CBC4");
-                BtnON = Color.parseColor("#003300");
-                BtnOFF = Color.parseColor("#7f0000");
-                CheckBoxColor = Color.parseColor("#80CBC4");
-                RadioColor = Color.parseColor("#FFFFFF");
-                NumberTxtColor = "#41c300";
+                TEXT_COLOR = Color.parseColor("YourTEXT_COLOR");
+                TEXT_COLOR_2 = Color.parseColor("YourTEXT_COLOR_2");
+                BTN_COLOR = Color.parseColor("YourBTN_COLOR");
+                MENU_BG_COLOR = Color.parseColor("YourMENU_BG_COLOR");
+                MENU_FEATURE_BG_COLOR = Color.parseColor("YourMENU_FEATURE_BG_COLOR");
+                ToggleON = Color.parseColor("YourToggleON");
+                ToggleOFF = Color.parseColor("YourToggleOFF");
+                BtnON = Color.parseColor("YourBtnON");
+                BtnOFF = Color.parseColor("YourBtnOFF");
+                CategoryBG =  Color.parseColor("YourCategoryBG");
+                SeekBarColor = Color.parseColor("YourSeekBarColor");
+                SeekBarProgressColor = Color.parseColor("YourSeekBarProgressColor");
+                CheckBoxColor = Color.parseColor("YourCheckBoxColor");
+                RadioColor = Color.parseColor("YourRadioColor");
+                NumberTxtColor = "YourNumberTxtColor";
                 break;
         }
     }
