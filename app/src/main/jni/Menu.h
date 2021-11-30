@@ -22,7 +22,7 @@ void setTitleText(JNIEnv *env, jobject thiz, jobject obj) {
 void setHeadingText(JNIEnv *env, jobject thiz, jobject obj) {
     setText(env, obj, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
                                       "<p style=\"color:green;\">Modded by (yourName)</p> | "
-                                      "(yourSite) | (yourText)</p>"
+                                      "(yourText)</p>"
                                       "</marquee></b>"));
 
     headingValid = true;
