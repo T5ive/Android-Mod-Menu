@@ -16,6 +16,7 @@
 
 #define targetLibName OBFUSCATE("(yourTargetLibName)")
 #include "Includes/Macros.h"
+//NewIncludeHere
 
 struct My_Patches {
     //VariableHere
