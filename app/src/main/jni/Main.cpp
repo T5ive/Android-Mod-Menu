@@ -55,9 +55,6 @@ jobjectArray getFeatureList(JNIEnv *env, jobject context) {
     //ToastHere
 
     const char *features[] = {//(yourFeaturesList)
-            OBFUSCATE("RichWebView_<html><body><marquee style=\"color: white; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">"
-                      "(yourEndCredit)"
-                      "</marquee></body></html>")
     };
 
     int Total_Feature = (sizeof features / sizeof features[0]);
