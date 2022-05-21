@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 #include <pthread.h>
+#include <thread>
 #include <cstring>
 #include <jni.h>
 #include <unistd.h>
@@ -12,15 +13,11 @@
 #include "Includes/obfuscate.h"
 #include "Includes/Utils.h"
 #include "KittyMemory/MemoryPatch.h"
-#include "Menu.h"
+#include "Menu/Setup.h"
 
 #define targetLibName OBFUSCATE("(yourTargetLibName)")
 #include "Includes/Macros.h"
 //NewIncludeHere
-
-struct My_Patches {
-    //VariableHere
-} hexPatches;
 
 //NewVariableHere
 
@@ -39,21 +36,11 @@ void *hack_thread(void *) {
 #else
     //(hackThread)
 #endif
-
-    sleep(20);
-    if (!titleValid || !headingValid || !iconValid || !settingsValid) {
-        int *p = 0;
-        *p = 0;
-    }
-
     return NULL;
 }
 
-jobjectArray getFeatureList(JNIEnv *env, jobject context) {
+jobjectArray GetFeatureList(JNIEnv *env, jobject context) {
     jobjectArray ret;
-
-    //ToastHere
-
     const char *features[] = {//(yourFeaturesList)
     };
 
@@ -69,8 +56,8 @@ jobjectArray getFeatureList(JNIEnv *env, jobject context) {
 }
 
 void Changes(JNIEnv *env, jclass clazz, jobject obj,
-                                    jint featNum, jstring featName, jint value,
-                                    jboolean boolean, jstring str) {
+                                        jint featNum, jstring featName, jint value,
+                                        jboolean boolean, jstring str) {
 
     LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d | Text: = %s"), featNum,
          env->GetStringUTFChars(featName, 0), value,
@@ -87,49 +74,59 @@ void lib_main() {
     pthread_create(&ptid, NULL, hack_thread, NULL);
 }
 
+int RegisterMenu(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("Icon"), OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(Icon)},
+            {OBFUSCATE("IconWebViewData"),  OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(IconWebViewData)},
+            {OBFUSCATE("IsGameLibLoaded"),  OBFUSCATE("()Z"), reinterpret_cast<void *>(isGameLibLoaded)},
+            {OBFUSCATE("Init"),  OBFUSCATE("(Landroid/content/Context;Landroid/widget/TextView;Landroid/widget/TextView;)V"), reinterpret_cast<void *>(Init)},
+            {OBFUSCATE("SettingsList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(SettingsList)},
+            {OBFUSCATE("GetFeatureList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(GetFeatureList)},
+    };
+
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Menu"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+    return JNI_OK;
+}
+
+int RegisterPreferences(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("Changes"), OBFUSCATE("(Landroid/content/Context;ILjava/lang/String;IZLjava/lang/String;)V"), reinterpret_cast<void *>(Changes)},
+    };
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Preferences"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+    return JNI_OK;
+}
+
+int RegisterMain(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("CheckOverlayPermission"), OBFUSCATE("(Landroid/content/Context;)V"), reinterpret_cast<void *>(CheckOverlayPermission)},
+    };
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Main"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+
+    return JNI_OK;
+}
+
 extern "C"
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *globalEnv;
-    vm->GetEnv((void **) &globalEnv, JNI_VERSION_1_6);
-        jclass c = globalEnv->FindClass("com/android/support/Menu");
-        if (c != nullptr){
-            static const JNINativeMethod menuMethods[] = {
-                  {OBFUSCATE("Icon"), OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(Icon)},
-                  {OBFUSCATE("IconWebViewData"),  OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(IconWebViewData)},
-                  {OBFUSCATE("isGameLibLoaded"),  OBFUSCATE("()Z"), reinterpret_cast<void *>(isGameLibLoaded)},
-                  {OBFUSCATE("setHeadingText"),  OBFUSCATE("(Landroid/widget/TextView;)V"), reinterpret_cast<void *>(setHeadingText)},
-                  {OBFUSCATE("setTitleText"),  OBFUSCATE("(Landroid/widget/TextView;)V"), reinterpret_cast<void *>(setTitleText)},
-                  {OBFUSCATE("settingsList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(settingsList)},
-                  {OBFUSCATE("getFeatureList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(getFeatureList)},
-            };
-
-            int mm = globalEnv->RegisterNatives(c, menuMethods, sizeof(menuMethods) / sizeof(JNINativeMethod));
-            if (mm != JNI_OK) {
-                LOGE(OBFUSCATE("Menu methods error"));
-                return mm;
-            }
-        }
-        else{
-            LOGE(OBFUSCATE("JNI error"));
-            return JNI_ERR;
-        }
-
-        jclass p = globalEnv->FindClass( OBFUSCATE("com/android/support/Preferences"));
-        if (p != nullptr){
-            static const JNINativeMethod prefmethods[] = {
-                    { OBFUSCATE("Changes"), OBFUSCATE("(Landroid/content/Context;ILjava/lang/String;IZLjava/lang/String;)V"), reinterpret_cast<void *>(Changes)},
-            };
-
-            int pm = globalEnv->RegisterNatives(p, prefmethods, sizeof(prefmethods) / sizeof(JNINativeMethod));
-            if (pm != JNI_OK){
-                LOGE(OBFUSCATE("Preferences methods error"));
-                return pm;
-            }
-        }
-        else{
-            LOGE(OBFUSCATE("JNI error"));
-            return JNI_ERR;
-        }
+    JNIEnv *env;
+    vm->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (RegisterMenu(env) != 0)
+        return JNI_ERR;
+    if (RegisterPreferences(env) != 0)
+        return JNI_ERR;
+    if (RegisterMain(env) != 0)
+        return JNI_ERR;
     return JNI_VERSION_1_6;
 }
