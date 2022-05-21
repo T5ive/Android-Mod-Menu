@@ -1058,8 +1058,8 @@ public class Menu {
         layoutParams.setMargins(7, 5, 7, 5);
 
         final Button button = new Button(getContext);
-        int num = Preferences.loadPrefInt(featName, featNum);
-        button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((num == 0) ? 1 : num) + "</font>"));
+        final int[] num = {Preferences.loadPrefInt(featName, featNum)};
+        button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((num[0] == 0) ? 1 : num[0]) + "</font>"));
         button.setAllCaps(false);
         button.setLayoutParams(layoutParams);
         button.setBackgroundColor(BTN_COLOR);
@@ -1075,7 +1075,7 @@ public class Menu {
         button.setOnClickListener(new View.OnClickListener() {
             boolean isOn = finalIsOn;
             public void onClick(View v) {
-                Preferences.changeFeatureBoolInt(finalFeatName, featNum, isOn, num);
+                Preferences.changeFeatureBoolInt(finalFeatName, featNum, isOn, num[0]);
                 if (isOn) {
                     _isOn[0] = " : ON";
                     button.setBackgroundColor(BtnON);
@@ -1085,7 +1085,7 @@ public class Menu {
                     button.setBackgroundColor(BtnOFF);
                     isOn = true;
                 }
-                button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num + "</font>" + _isOn[0]));
+                button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num[0] + "</font>" + _isOn[0]));
             }
         });
 
@@ -1123,19 +1123,18 @@ public class Menu {
 
                 alertName.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        int num;
                         try {
-                            num = Integer.parseInt(TextUtils.isEmpty(editText.getText().toString()) ? "0" : editText.getText().toString());
-                            if (maxValue != 0 && num >= maxValue)
-                                num = maxValue;
+                            num[0] = Integer.parseInt(TextUtils.isEmpty(editText.getText().toString()) ? "0" : editText.getText().toString());
+                            if (maxValue != 0 && num[0] >= maxValue)
+                                num[0] = maxValue;
                         } catch (NumberFormatException ex) {
                             if (maxValue != 0)
-                                num = maxValue;
+                                num[0] = maxValue;
                             else
-                                num = 2147483640;
+                                num[0] = 2147483640;
                         }
-                        button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num + "</font>" + _isOn[0]));
-                        Preferences.changeFeatureBoolInt(featName, featNum, isOn, num);
+                        button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num[0] + "</font>" + _isOn[0]));
+                        Preferences.changeFeatureBoolInt(featName, featNum, isOn, num[0]);
                         editText.setFocusable(false);
                     }
                 });
