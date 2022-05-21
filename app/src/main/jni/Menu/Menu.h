@@ -1,5 +1,6 @@
-bool titleValid, headingValid, iconValid, settingsValid, isLeeched;
+bool iconValid, settingsValid, initValid;
 
+//Big letter cause crash
 void setText(JNIEnv *env, jobject obj, const char* text){
     //https://stackoverflow.com/a/33627640/3763113
     //A little JNI calls here. You really really need a great knowledge if you want to play with JNI stuff
@@ -16,21 +17,6 @@ void setText(JNIEnv *env, jobject obj, const char* text){
     (*env).CallVoidMethod(obj, setText,  (*env).CallStaticObjectMethod(html, fromHtml, jstr));
 }
 
-void setTitleText(JNIEnv *env, jobject thiz, jobject obj) {
-    setText(env, obj, OBFUSCATE("<b>Modded by TFive</b>"));
-
-    titleValid = true;
-}
-
-void setHeadingText(JNIEnv *env, jobject thiz, jobject obj) {
-    setText(env, obj, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                                      "<p style=\"color:green;\">Modded by TFive</p> | "
-                                      "https://github.com/T5ive | Available for free</p>"
-                                      "</marquee></b>"));
-
-    headingValid = true;
-}
-
 jstring Icon(JNIEnv *env, jobject thiz) {
     iconValid = true;
 
@@ -44,7 +30,7 @@ jstring IconWebViewData(JNIEnv *env, jobject thiz) {
     //WebView support GIF animation. Upload your image or GIF on imgur.com or other sites
 
     // From internet (Requires android.permission.INTERNET)
-       return env->NewStringUTF(OBFUSCATE("https://i.imgur.com/qfKEHya.png"));
+    return env->NewStringUTF(OBFUSCATE("https://i.imgur.com/qfKEHya.png"));
 
     // Base64 html:
     // return env->NewStringUTF("data:image/png;base64, <encoded base64 here>");
@@ -52,23 +38,17 @@ jstring IconWebViewData(JNIEnv *env, jobject thiz) {
     // To disable it, return NULL. It will use normal image above:
     // return NULL
 
+    //return env->NewStringUTF(OBFUSCATE_KEY("https://i.imgur.com/SujJ85j.gif", 'u'));
     return NULL;
 }
 
-jobjectArray settingsList(JNIEnv *env, jobject activityObject) {
+jobjectArray SettingsList(JNIEnv *env, jobject activityObject) {
     jobjectArray ret;
 
     const char *features[] = {
             OBFUSCATE("Category_Settings"),
             OBFUSCATE("-1_Toggle_Save feature preferences"), //-1 is checked on Preferences.java
             OBFUSCATE("-3_Toggle_Auto size vertically"),
-            OBFUSCATE("Category_Logcat"),
-            OBFUSCATE("RichTextView_Save logcat if a bug occured and sent it to the modder. Clear logcat and reproduce bug again if the log file is too large"),
-            OBFUSCATE("RichTextView_<small>Saving logcat does not need file permission. Logcat location:"
-                            "<br/>Android 11: /storage/emulated/0/Documents/"
-                            "<br/>Android 10 and below: /storage/emulated/0/Android/data/(package name)/files/Mod Menu</small>"),
-            OBFUSCATE("-4_Button_Save logcat to file"),
-            OBFUSCATE("-5_Button_Clear logcat"),
             OBFUSCATE("Category_Menu"),
             OBFUSCATE("-6_Button_<font color='red'>Close settings</font>"),
     };

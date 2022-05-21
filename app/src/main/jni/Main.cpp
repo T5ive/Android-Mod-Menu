@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 #include <pthread.h>
+#include <thread>
 #include <cstring>
 #include <jni.h>
 #include <unistd.h>
@@ -11,22 +12,13 @@
 #include "Includes/Logger.h"
 #include "Includes/obfuscate.h"
 #include "Includes/Utils.h"
-
 #include "KittyMemory/MemoryPatch.h"
-#include "Menu.h"
+#include "Menu/Setup.h"
 
 //Target lib here
-#define targetLibName OBFUSCATE("libil2cpp.so")
+#define targetLibName OBFUSCATE("libFileA.so")
 
 #include "Includes/Macros.h"
-
-// fancy struct for patches for kittyMemory
-struct My_Patches {
-    // let's assume we have patches for these functions for whatever game
-    // like show in miniMap boolean function
-    MemoryPatch GodMode, GodMode2, SliderExample;
-    // etc...
-} hexPatches;
 
 bool feature1, feature2, featureHookToggle, Health;
 int sliderValue = 1, level = 0;
@@ -88,18 +80,6 @@ void *hack_thread(void *) {
     LOGI(OBFUSCATE("%s has been loaded"), (const char *) targetLibName);
 
 #if defined(__aarch64__) //To compile this code for arm64 lib only. Do not worry about greyed out highlighting code, it still works
-    // New way to patch hex via KittyMemory without need to  specify len. Spaces or without spaces are fine
-    // ARM64 assembly example
-    // MOV X0, #0x0 = 00 00 80 D2
-    // RET = C0 03 5F D6
-    hexPatches.GodMode = MemoryPatch::createWithHex(targetLibName,
-                                                    string2Offset(OBFUSCATE("0x123456")),
-                                                    OBFUSCATE("00 00 80 D2 C0 03 5F D6"));
-    //You can also specify target lib like this
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE("0x222222")),
-                                                     OBFUSCATE("20 00 80 D2 C0 03 5F D6"));
-
     // Hook example. Comment out if you don't use hook
     // Strings in macros are automatically obfuscated. No need to obfuscate!
     HOOK("str", FunctionExample, old_FunctionExample);
@@ -112,23 +92,13 @@ void *hack_thread(void *) {
     HOOKSYM_LIB_NO_ORIG("libFileB.so", "__SymbolNameExample", FunctionExample);
 
     // Patching offsets directly. Strings are automatically obfuscated too!
-    PATCHOFFSET("0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
-    PATCHOFFSET_LIB("libFileB.so", "0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
-    
+    PATCH("0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
+    PATCH_LIB("libFileB.so", "0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
+
     AddMoneyExample = (void(*)(void *,int))getAbsoluteAddress(targetLibName, 0x123456);
 
 #else //To compile this code for armv7 lib only.
-    // New way to patch hex via KittyMemory without need to specify len. Spaces or without spaces are fine
-    // ARMv7 assembly example
-    // MOV R0, #0x0 = 00 00 A0 E3
-    // BX LR = 1E FF 2F E1
-    hexPatches.GodMode = MemoryPatch::createWithHex(targetLibName, //Normal obfuscate
-                                                    string2Offset(OBFUSCATE("0x123456")),
-                                                    OBFUSCATE("00 00 A0 E3 1E FF 2F E1"));
-    //You can also specify target lib like this
-    hexPatches.GodMode2 = MemoryPatch::createWithHex("libtargetLibHere.so",
-                                                     string2Offset(OBFUSCATE("0x222222")),
-                                                     OBFUSCATE("01 00 A0 E3 1E FF 2F E1"));
+
     // Hook example. Comment out if you don't use hook
     // Strings in macros are automatically obfuscated. No need to obfuscate!
     HOOK("str", FunctionExample, old_FunctionExample);
@@ -141,25 +111,28 @@ void *hack_thread(void *) {
     HOOKSYM_LIB_NO_ORIG("libFileB.so", "__SymbolNameExample", FunctionExample);
 
     // Patching offsets directly. Strings are automatically obfuscated too!
-    PATCHOFFSET("0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
-    PATCHOFFSET_LIB("libFileB.so", "0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
+    PATCH("0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
+    PATCH_LIB("libFileB.so", "0x20D3A8", "00 00 A0 E3 1E FF 2F E1");
+
+    //Restore changes to original
+    RESTORE("0x20D3A8");
+    RESTORE_LIB("libFileB.so", "0x20D3A8");
 
     AddMoneyExample = (void (*)(void *, int)) getAbsoluteAddress(targetLibName, 0x123456);
 
     LOGI(OBFUSCATE("Done"));
 #endif
 
-// Anti Leech
-    sleep(20);
-    if (!titleValid || !headingValid || !iconValid || !settingsValid) {
+    //Anti-leech
+    /*if (!iconValid || !initValid || !settingsValid) {
+        //Bad function to make it crash
+        sleep(5);
         int *p = 0;
         *p = 0;
-    }
+    }*/
 
     return NULL;
 }
-
-/// -------------------------------------------------------------------- ///
 
 // Do not change or translate the first text unless you know what you are doing
 // Assigning feature numbers is optional. Without it, it will automatically count for you, starting from 0
@@ -168,11 +141,8 @@ void *hack_thread(void *) {
 // Toggle, ButtonOnOff and Checkbox can be switched on by default, if you add True_. Example: CheckBox_True_The Check Box
 // To learn HTML, go to this page: https://www.w3schools.com/
 
-jobjectArray getFeatureList(JNIEnv *env, jobject context) {
+jobjectArray GetFeatureList(JNIEnv *env, jobject context) {
     jobjectArray ret;
-
-    //Toasts added here so it's harder to remove it
-    MakeToast(env, context, OBFUSCATE("Modded by TFive"), Toast::LENGTH_LONG);
 
     const char *features[] = {
             OBFUSCATE("Category_The Category"), //Not counted
@@ -190,21 +160,23 @@ jobjectArray getFeatureList(JNIEnv *env, jobject context) {
             OBFUSCATE("InputValue_1000_Input number 2"), //Max value
             OBFUSCATE("InputText_Input text"),
             OBFUSCATE("RadioButton_Radio buttons_OFF,Mod 1,Mod 2,Mod 3"),
+            OBFUSCATE("SeekBarSwitch_Seekbar_1_100"),
+            OBFUSCATE("InputNumOnOff_500_Test Input Vales"),
+            OBFUSCATE("InputNumButton_5000_Test Input Button"),
 
             //Create new collapse
             OBFUSCATE("Collapse_Collapse 1"),
             OBFUSCATE("CollapseAdd_Toggle_The toggle"),
             OBFUSCATE("CollapseAdd_Toggle_The toggle"),
             OBFUSCATE("123_CollapseAdd_Toggle_The toggle"),
+            OBFUSCATE("122_CollapseAdd_CheckBox_Check box"),
             OBFUSCATE("CollapseAdd_Button_The button"),
 
             //Create new collapse again
-            OBFUSCATE("Collapse_Collapse 2"),
+            OBFUSCATE("Collapse_Collapse 2_True"),
             OBFUSCATE("CollapseAdd_SeekBar_The slider_1_100"),
             OBFUSCATE("CollapseAdd_InputValue_Input number"),
-            OBFUSCATE("SeekBarSwitch_Seekbar_1_100"),
-            OBFUSCATE("InputOnOff_500_Test Input Vales"),
-            OBFUSCATE("InputButton_5000_Test Input Button"),
+
             OBFUSCATE("RichTextView_This is text view, not fully HTML."
                       "<b>Bold</b> <i>italic</i> <u>underline</u>"
                       "<br />New line <font color='red'>Support colors</font>"
@@ -229,8 +201,8 @@ jobjectArray getFeatureList(JNIEnv *env, jobject context) {
 }
 
 void Changes(JNIEnv *env, jclass clazz, jobject obj,
-                                    jint featNum, jstring featName, jint value,
-                                    jboolean boolean, jstring str) {
+                                        jint featNum, jstring featName, jint value,
+                                        jboolean boolean, jstring str) {
 
     LOGD(OBFUSCATE("Feature name: %d - %s | Value: = %d | Bool: = %d | Text: = %s"), featNum,
          env->GetStringUTFChars(featName, 0), value,
@@ -240,23 +212,25 @@ void Changes(JNIEnv *env, jclass clazz, jobject obj,
 
     switch (featNum) {
         case 0:
-            feature2 = boolean;
-            if (feature2) {
-                // To print bytes you can do this
-                //if (hexPatches.GodMode.Modify()) {
-                //    LOGD(OBFUSCATE("Current Bytes: %s"),
-                //         hexPatches.GodMode.get_CurrBytes().c_str());
-                //}
-                hexPatches.GodMode.Modify();
-                hexPatches.GodMode2.Modify();
-                //LOGI(OBFUSCATE("On"));
-            } else {
-                hexPatches.GodMode.Restore();
-                hexPatches.GodMode2.Restore();
-                //LOGI(OBFUSCATE("Off"));
-            }
+            // A much simpler way to patch hex via KittyMemory without need to specify the struct and len. Spaces or without spaces are fine
+            // ARMv7 assembly example
+            // MOV R0, #0x0 = 00 00 A0 E3
+            // BX LR = 1E FF 2F E1
+            PATCH_LIB_SWITCH("libil2cpp.so", "0x100000", "00 00 A0 E3 1E FF 2F E1", boolean);
             break;
         case 100:
+            //Reminder that the strings are auto obfuscated
+            //Switchable patch
+            PATCH_SWITCH("0x400000", "00 00 A0 E3 1E FF 2F E1", boolean);
+            PATCH_LIB_SWITCH("libil2cpp.so", "0x200000", "00 00 A0 E3 1E FF 2F E1", boolean);
+            PATCH_SYM_SWITCH("_SymbolExample", "00 00 A0 E3 1E FF 2F E1", boolean);
+            PATCH_LIB_SYM_SWITCH("libNativeGame.so", "_SymbolExample", "00 00 A0 E3 1E FF 2F E1", boolean);
+
+            //Restore patched offset to original
+            RESTORE("0x400000");
+            RESTORE_LIB("libil2cpp.so", "0x400000");
+            RESTORE_SYM("_SymbolExample");
+            RESTORE_LIB_SYM("libil2cpp.so", "_SymbolExample");
             break;
         case 110:
             break;
@@ -269,29 +243,13 @@ void Changes(JNIEnv *env, jclass clazz, jobject obj,
             switch (value) {
                 //For noobies
                 case 0:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName, string2Offset(
-                                    OBFUSCATE("0x100000")),
-                            OBFUSCATE(
-                                    "00 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
+                    RESTORE("0x0");
                     break;
                 case 1:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName, string2Offset(
-                                    OBFUSCATE("0x100000")),
-                            OBFUSCATE(
-                                    "01 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
+                    PATCH("0x0", "01 00 A0 E3 1E FF 2F E1");
                     break;
                 case 2:
-                    hexPatches.SliderExample = MemoryPatch::createWithHex(
-                            targetLibName,
-                            string2Offset(
-                                    OBFUSCATE("0x100000")),
-                            OBFUSCATE(
-                                    "02 00 A0 E3 1E FF 2F E1"));
-                    hexPatches.SliderExample.Modify();
+                    PATCH("0x0", "02 00 A0 E3 1E FF 2F E1");
                     break;
             }
             break;
@@ -312,7 +270,7 @@ void Changes(JNIEnv *env, jclass clazz, jobject obj,
             // Since we have instanceBtn as a field, we can call it out of Update hook function
             if (instanceBtn != NULL)
                 AddMoneyExample(instanceBtn, 999999);
-            // MakeToast(env, obj, OBFUSCATE("Button pressed"), Toast::LENGTH_SHORT);
+            // Toast(env, obj, OBFUSCATE("Button pressed"), ToastLength::LENGTH_SHORT);
             break;
         case 5:
             break;
@@ -323,7 +281,6 @@ void Changes(JNIEnv *env, jclass clazz, jobject obj,
             level = value;
             break;
         case 8:
-            //MakeToast(env, obj, TextInput, Toast::LENGTH_SHORT);
             break;
         case 9:
             break;
@@ -337,54 +294,59 @@ void lib_main() {
     pthread_create(&ptid, NULL, hack_thread, NULL);
 }
 
+int RegisterMenu(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("Icon"), OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(Icon)},
+            {OBFUSCATE("IconWebViewData"),  OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(IconWebViewData)},
+            {OBFUSCATE("IsGameLibLoaded"),  OBFUSCATE("()Z"), reinterpret_cast<void *>(isGameLibLoaded)},
+            {OBFUSCATE("Init"),  OBFUSCATE("(Landroid/content/Context;Landroid/widget/TextView;Landroid/widget/TextView;)V"), reinterpret_cast<void *>(Init)},
+            {OBFUSCATE("SettingsList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(SettingsList)},
+            {OBFUSCATE("GetFeatureList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(GetFeatureList)},
+    };
+
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Menu"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+    return JNI_OK;
+}
+
+int RegisterPreferences(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("Changes"), OBFUSCATE("(Landroid/content/Context;ILjava/lang/String;IZLjava/lang/String;)V"), reinterpret_cast<void *>(Changes)},
+    };
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Preferences"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+    return JNI_OK;
+}
+
+int RegisterMain(JNIEnv *env) {
+    JNINativeMethod methods[] = {
+            {OBFUSCATE("CheckOverlayPermission"), OBFUSCATE("(Landroid/content/Context;)V"), reinterpret_cast<void *>(CheckOverlayPermission)},
+    };
+    jclass clazz = env->FindClass(OBFUSCATE("com/android/support/Main"));
+    if (!clazz)
+        return JNI_ERR;
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) != 0)
+        return JNI_ERR;
+
+    return JNI_OK;
+}
+
 extern "C"
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *globalEnv;
-    vm->GetEnv((void **) &globalEnv, JNI_VERSION_1_6);
-    // Register your class native methods. Build and ecompile the app and see the signature
-        // This is to hide function names from disassembler
-        // See more: https://developer.android.com/training/articles/perf-jni#native-libraries
-
-        //Your menu class
-        jclass c = globalEnv->FindClass("com/android/support/Menu");
-        if (c != nullptr){
-            static const JNINativeMethod menuMethods[] = {
-                  {OBFUSCATE("Icon"), OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(Icon)},
-                  {OBFUSCATE("IconWebViewData"),  OBFUSCATE("()Ljava/lang/String;"), reinterpret_cast<void *>(IconWebViewData)},
-                  {OBFUSCATE("isGameLibLoaded"),  OBFUSCATE("()Z"), reinterpret_cast<void *>(isGameLibLoaded)},
-                  {OBFUSCATE("setHeadingText"),  OBFUSCATE("(Landroid/widget/TextView;)V"), reinterpret_cast<void *>(setHeadingText)},
-                  {OBFUSCATE("setTitleText"),  OBFUSCATE("(Landroid/widget/TextView;)V"), reinterpret_cast<void *>(setTitleText)},
-                  {OBFUSCATE("settingsList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(settingsList)},
-                  {OBFUSCATE("getFeatureList"),  OBFUSCATE("()[Ljava/lang/String;"), reinterpret_cast<void *>(getFeatureList)},
-            };
-
-            int mm = globalEnv->RegisterNatives(c, menuMethods, sizeof(menuMethods) / sizeof(JNINativeMethod));
-            if (mm != JNI_OK) {
-                LOGE(OBFUSCATE("Menu methods error"));
-                return mm;
-            }
-        }
-        else{
-            LOGE(OBFUSCATE("JNI error"));
-            return JNI_ERR;
-        }
-
-        jclass p = globalEnv->FindClass( OBFUSCATE("com/android/support/Preferences"));
-        if (p != nullptr){
-            static const JNINativeMethod prefmethods[] = {
-                    { OBFUSCATE("Changes"), OBFUSCATE("(Landroid/content/Context;ILjava/lang/String;IZLjava/lang/String;)V"), reinterpret_cast<void *>(Changes)},
-            };
-
-            int pm = globalEnv->RegisterNatives(p, prefmethods, sizeof(prefmethods) / sizeof(JNINativeMethod));
-            if (pm != JNI_OK){
-                LOGE(OBFUSCATE("Preferences methods error"));
-                return pm;
-            }
-        }
-        else{
-            LOGE(OBFUSCATE("JNI error"));
-            return JNI_ERR;
-        }
+    JNIEnv *env;
+    vm->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (RegisterMenu(env) != 0)
+        return JNI_ERR;
+    if (RegisterPreferences(env) != 0)
+        return JNI_ERR;
+    if (RegisterMain(env) != 0)
+        return JNI_ERR;
     return JNI_VERSION_1_6;
 }
