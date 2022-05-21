@@ -489,7 +489,7 @@ public class Menu {
                     break;
                 case "InputValue":
                     if (strSplit.length == 3)
-                        InputNum(linearLayout, featNum, strSplit[2], Integer.parseInt(strSplit[1]));
+                        InputNum(linearLayout, featNum, strSplit[1], Integer.parseInt(strSplit[2]));
                     if (strSplit.length == 2)
                         InputNum(linearLayout, featNum, strSplit[1], 0);
                     break;
@@ -521,7 +521,7 @@ public class Menu {
                     break;
                 case "InputNumOnOff":
                     if (strSplit.length == 3)
-                        InputNumOnOff(linearLayout, featNum, strSplit[2], Integer.parseInt(strSplit[1]), switchedOn);
+                        InputNumOnOff(linearLayout, featNum, strSplit[1], Integer.parseInt(strSplit[2]), switchedOn);
                     if (strSplit.length == 2)
                         InputNumOnOff(linearLayout, featNum, strSplit[1],0, switchedOn);
                     break;
@@ -530,7 +530,7 @@ public class Menu {
                     break;
                 case "InputNumButton":
                     if (strSplit.length == 3)
-                        InputNumButton(linearLayout, featNum, strSplit[2], Integer.parseInt(strSplit[1]));
+                        InputNumButton(linearLayout, featNum, strSplit[1], Integer.parseInt(strSplit[2]));
                     if (strSplit.length == 2)
                         InputNumButton(linearLayout, featNum, strSplit[1], 0);
                     break;

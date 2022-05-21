@@ -17,15 +17,13 @@ void setText(JNIEnv *env, jobject obj, const char* text){
 jstring Icon(JNIEnv *env, jobject thiz) {
     iconValid = true;
 
-    return env->NewStringUTF(
-            OBFUSCATE("(yourImage)"));
+    return env->NewStringUTF(OBFUSCATE("(yourImage)"));
 }
 
 jstring IconWebViewData(JNIEnv *env, jobject thiz) {
     iconValid = true;
 
     return env->NewStringUTF(OBFUSCATE("(yourWebImage)"));
-    return NULL;
 }
 
 jobjectArray SettingsList(JNIEnv *env, jobject activityObject) {
