@@ -38,18 +38,19 @@ LOCAL_SRC_FILES := Main.cpp \
     Menu/Menu.cpp \
     Menu/Setup.cpp \
     Includes/Utils.cpp \
-	Substrate/hde64.c \
-	Substrate/SubstrateDebug.cpp \
-	Substrate/SubstrateHook.cpp \
-	Substrate/SubstratePosixMemory.cpp \
-	Substrate/SymbolFinder.cpp \
-	KittyMemory/KittyArm64.cpp \
-    KittyMemory/KittyScanner.cpp \
+	KittyMemory/KittyAsm.cpp \
+	KittyMemory/KittyIOFile.cpp \
     KittyMemory/KittyMemory.cpp \
+    KittyMemory/KittyPtrValidator.cpp \
+    KittyMemory/KittyScanner.cpp \
     KittyMemory/KittyUtils.cpp \
-    KittyMemory/MemoryPatch.cpp \
     KittyMemory/MemoryBackup.cpp \
-	And64InlineHook/And64InlineHook.cpp \
+    KittyMemory/MemoryPatch.cpp \
+	xDL/xdl.c \
+	xDL/xdl_iterate.c \
+	xDL/xdl_linker.c \
+	xDL/xdl_lzma.c \
+	xDL/xdl_util.c \
 
 LOCAL_STATIC_LIBRARIES := Keystone Dobby
 

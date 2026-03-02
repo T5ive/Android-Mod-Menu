@@ -5,20 +5,22 @@
 #include <unistd.h>
 #include <cstdio>
 #include <cstring>
-#include <string>
 #include <cstdlib>
+#include <map>
+#include "xDL/xdl.h"
 #include "Includes/Logger.h"
+#include "KittyMemory/MemoryPatch.hpp"
 
-typedef unsigned long DWORD;
+uintptr_t getLibraryAddress(const char *library);
 
-DWORD findLibrary(const char *library);
+void* getAbsoluteAddress(const char *libraryName, const char *relative);
 
-DWORD getAbsoluteAddress(const char *libraryName, DWORD relativeAddr);
+void* getRelativeAddress(const char *libraryName, const char *rootOffset, const char *addOffset);
 
 jboolean isGameLibLoaded(JNIEnv *env, jobject thiz);
 
 bool isLibraryLoaded(const char *libraryName);
 
-uintptr_t str2Offset(const char *c);
+uintptr_t str2offset(const char *c);
 
 #endif

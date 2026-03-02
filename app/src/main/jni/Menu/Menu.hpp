@@ -1,7 +1,9 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
-#include <jni.h>
+#include "Jni.hpp"
+
+void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle);
 
 void setText(JNIEnv *env, jobject obj, const char* text);
 

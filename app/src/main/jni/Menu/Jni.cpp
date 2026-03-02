@@ -1,4 +1,3 @@
-
 #include "Jni.hpp"
 #include <list>
 #include <vector>
@@ -12,36 +11,28 @@
 #include <sstream>
 #include <dlfcn.h>
 #include "Includes/obfuscate.h"
-#include "Includes/get_device_api_level_inlines.h"
 #include "Menu/Jni.hpp"
 #include "Includes/Logger.h"
 
-//Jni stuff from MrDarkRX https://github.com/MrDarkRXx/DarkMod-Floating
-void setDialog(jobject ctx, JNIEnv *env, const char *title, const char *msg){
-    jclass Alert = env->FindClass(OBFUSCATE("android/app/AlertDialog$Builder"));
-    jmethodID AlertCons = env->GetMethodID(Alert, OBFUSCATE("<init>"), OBFUSCATE("(Landroid/content/Context;)V"));
+void Dialog(JNIEnv *env, jobject context, const char *title, const char *message, const char *openBtn, const char *closeBtn, int sec, const char *url) {
+    jclass dialogHelperClass = env->FindClass(OBFUSCATE("com/android/support/DialogHelper"));
+    jmethodID showMethod = env->GetStaticMethodID(dialogHelperClass, OBFUSCATE("showDialogWithLink"),
+                                                  OBFUSCATE("(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)V"));
 
-    jobject MainAlert = env->NewObject(Alert, AlertCons, ctx);
+    jstring jTitle = env->NewStringUTF(title);
+    jstring jMessage = env->NewStringUTF(message);
+    jstring jOpen = env->NewStringUTF(openBtn);
+    jstring jClose = env->NewStringUTF(closeBtn);
+    jint jSec = sec;
+    jstring jUrl = env->NewStringUTF(url);
 
-    jmethodID setTitle = env->GetMethodID(Alert, OBFUSCATE("setTitle"), OBFUSCATE("(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;"));
-    env->CallObjectMethod(MainAlert, setTitle, env->NewStringUTF(title));
+    env->CallStaticVoidMethod(dialogHelperClass, showMethod, context, jTitle, jMessage, jOpen, jClose, jSec, jUrl);
 
-    jmethodID setMsg = env->GetMethodID(Alert, OBFUSCATE("setMessage"), OBFUSCATE("(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;"));
-    env->CallObjectMethod(MainAlert, setMsg, env->NewStringUTF(msg));
-
-    jmethodID setCa = env->GetMethodID(Alert, OBFUSCATE("setCancelable"), OBFUSCATE("(Z)Landroid/app/AlertDialog$Builder;"));
-    env->CallObjectMethod(MainAlert, setCa, false);
-
-    jmethodID setPB = env->GetMethodID(Alert, OBFUSCATE("setPositiveButton"), OBFUSCATE("(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;"));
-    env->CallObjectMethod(MainAlert, setPB, env->NewStringUTF("Ok"), static_cast<jobject>(NULL));
-
-    jmethodID create = env->GetMethodID(Alert, OBFUSCATE("create"), OBFUSCATE("()Landroid/app/AlertDialog;"));
-    jobject creaetob = env->CallObjectMethod(MainAlert, create);
-
-    jclass AlertN = env->FindClass(OBFUSCATE("android/app/AlertDialog"));
-
-    jmethodID show = env->GetMethodID(AlertN, OBFUSCATE("show"), OBFUSCATE("()V"));
-    env->CallVoidMethod(creaetob, show);
+    env->DeleteLocalRef(jTitle);
+    env->DeleteLocalRef(jMessage);
+    env->DeleteLocalRef(jOpen);
+    env->DeleteLocalRef(jClose);
+    env->DeleteLocalRef(jUrl);
 }
 
 void Toast(JNIEnv *env, jobject thiz, const char *text, int length) {
@@ -51,6 +42,23 @@ void Toast(JNIEnv *env, jobject thiz, const char *text, int length) {
     jobject toastobj = env->CallStaticObjectMethod(toast, methodMakeText,thiz, jstr, length);
     jmethodID methodShow = env->GetMethodID(toast, OBFUSCATE("show"), OBFUSCATE("()V"));
     env->CallVoidMethod(toastobj, methodShow);
+}
+
+//Big letter cause crash
+void setText(JNIEnv *env, jobject obj, const char* text){
+    //https://stackoverflow.com/a/33627640/3763113
+    //A little JNI calls here. You really really need a great knowledge if you want to play with JNI stuff
+    //Html.fromHtml("");
+    jclass html = (*env).FindClass(OBFUSCATE("android/text/Html"));
+    jmethodID fromHtml = (*env).GetStaticMethodID(html, OBFUSCATE("fromHtml"), OBFUSCATE("(Ljava/lang/String;)Landroid/text/Spanned;"));
+
+    //setText("");
+    jclass textView = (*env).FindClass(OBFUSCATE("android/widget/TextView"));
+    jmethodID setText = (*env).GetMethodID(textView, OBFUSCATE("setText"), OBFUSCATE("(Ljava/lang/CharSequence;)V"));
+
+    //Java string
+    jstring jstr = (*env).NewStringUTF(text);
+    (*env).CallVoidMethod(obj, setText,  (*env).CallStaticObjectMethod(html, fromHtml, jstr));
 }
 
 void startService(JNIEnv *env, jobject ctx){
@@ -66,6 +74,12 @@ void startService(JNIEnv *env, jobject ctx){
 void *exit_thread(void *) {
     sleep(5);
     exit(0);
+}
+
+int get_api_sdk(JNIEnv* env) {
+    jclass build_version_class = env->FindClass(OBFUSCATE("android/os/Build$VERSION"));
+    jfieldID sdk_int_field = env->GetStaticFieldID(build_version_class, OBFUSCATE("SDK_INT"), OBFUSCATE("I"));
+    return env->GetStaticIntField(build_version_class, sdk_int_field);
 }
 
 void startActivityPermisson(JNIEnv *env, jobject ctx){
@@ -93,15 +107,14 @@ void startActivityPermisson(JNIEnv *env, jobject ctx){
     env->CallVoidMethod(ctx, startActivity, intent);
 }
 
-
 //Needed jclass parameter because this is a static java method
 void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx){
     //If overlay permission option is greyed out, make sure to add android.permission.SYSTEM_ALERT_WINDOW in manifest
 
     LOGI(OBFUSCATE("Check overlay permission"));
 
-    int sdkVer = api_level();
-    if (sdkVer >= 23){ //Android 6.0
+    int sdkVer = get_api_sdk(env);
+    if (sdkVer >= 23) { //Android 6.0
         jclass Settings = env->FindClass(OBFUSCATE("android/provider/Settings"));
         jmethodID canDraw =env->GetStaticMethodID(Settings, OBFUSCATE("canDrawOverlays"), OBFUSCATE("(Landroid/content/Context;)Z"));
         if (!env->CallStaticBooleanMethod(Settings, canDraw, ctx)){
@@ -115,9 +128,6 @@ void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx){
         }
     }
 
-
     LOGI(OBFUSCATE("Start service"));
-
-    //StartMod Normal
     startService(env, ctx);
 }

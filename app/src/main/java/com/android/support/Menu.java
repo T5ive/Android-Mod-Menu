@@ -5,7 +5,6 @@ package com.android.support;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,6 +56,7 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -64,12 +64,8 @@ import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
 import static android.widget.RelativeLayout.ALIGN_PARENT_LEFT;
 import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
 
-import org.xml.sax.ErrorHandler;
-
 public class Menu {
     //********** Here you can easly change the menu appearance **********//
-
-    //region Variable
     public static final String TAG = "Mod_Menu"; //Tag for logcat
 
     int TEXT_COLOR = Color.parseColor("#82CAFD");
@@ -94,7 +90,7 @@ public class Menu {
     int SeekBarProgressColor = Color.parseColor("#80CBC4");
     int CheckBoxColor = Color.parseColor("#80CBC4");
     int RadioColor = Color.parseColor("#FFFFFF");
-	int CollapseColor = Color.parseColor("#232F2C");
+    int CollapseColor = Color.parseColor("#232F2C");
     String NumberTxtColor = "#41c300";
     //********************************************************************//
 
@@ -151,7 +147,7 @@ public class Menu {
         //********** The icon to open mod menu **********
         startimage = new ImageView(context);
         startimage.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension = (int) TypedValue.applyDimension(1, ICON_SIZE, context.getResources().getDisplayMetrics()); //Icon size
+        int applyDimension = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ICON_SIZE, context.getResources().getDisplayMetrics()); //Icon size
         startimage.getLayoutParams().height = applyDimension;
         startimage.getLayoutParams().width = applyDimension;
         //startimage.requestLayout();
@@ -171,7 +167,7 @@ public class Menu {
         //********** The icon in Webview to open mod menu **********
         WebView wView = new WebView(context); //Icon size width=\"50\" height=\"50\"
         wView.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension2 = (int) TypedValue.applyDimension(1, ICON_SIZE, context.getResources().getDisplayMetrics()); //Icon size
+        int applyDimension2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ICON_SIZE, context.getResources().getDisplayMetrics()); //Icon size
         wView.getLayoutParams().height = applyDimension2;
         wView.getLayoutParams().width = applyDimension2;
         wView.loadData("<html>" +
@@ -209,7 +205,7 @@ public class Menu {
                         scrollView.removeView(mSettings);
                         scrollView.addView(mods);
                     }
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException ignored) {
                 }
             }
         });
@@ -364,7 +360,7 @@ public class Menu {
         vmParams.x = POS_X;
         vmParams.y = POS_Y;
 
-        mWindowManager = (WindowManager) getContext.getSystemService(getContext.WINDOW_SERVICE);
+        mWindowManager = (WindowManager) getContext.getSystemService(Context.WINDOW_SERVICE);
         mWindowManager.addView(rootFrame, vmParams);
 
         overlayRequired = true;
@@ -421,8 +417,7 @@ public class Menu {
                             try {
                                 collapsedView.setVisibility(View.GONE);
                                 expandedView.setVisibility(View.VISIBLE);
-                            } catch (NullPointerException e) {
-
+                            } catch (NullPointerException ignored) {
                             }
                         }
                         return true;
@@ -499,7 +494,7 @@ public class Menu {
                         InputNum(linearLayout, featNum, strSplit[2], Integer.parseInt(strSplit[1]));
                     if (strSplit.length == 2)
                         InputNum(linearLayout, featNum, strSplit[1], 0);
-						break;
+                    break;
                 case "InputLValue":
                     if (strSplit.length == 3)
                         InputLNum(linearLayout, featNum, strSplit[2], Long.parseLong(strSplit[1]));
@@ -551,13 +546,11 @@ public class Menu {
                 }
         );
         //Set colors of the switch. Comment out if you don't like it
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                switchR.getThumbDrawable().setTintList(buttonStates);
-                switchR.getTrackDrawable().setTintList(buttonStates);
-            } catch (NullPointerException ex) {
-                Log.d(TAG, String.valueOf(ex));
-            }
+        try {
+            switchR.getThumbDrawable().setTintList(buttonStates);
+            switchR.getTrackDrawable().setTintList(buttonStates);
+        } catch (NullPointerException ex) {
+            Log.d(TAG, String.valueOf(ex));
         }
         switchR.setText(featName);
         switchR.setTextColor(TEXT_COLOR_2);
@@ -569,8 +562,7 @@ public class Menu {
                 switch (featNum) {
                     case -1: //Save perferences
                         Preferences.with(switchR.getContext()).writeBoolean(-1, bool);
-                        if (bool == false)
-                            Preferences.with(switchR.getContext()).clear(); //Clear perferences if switched off
+                        if (!bool) Preferences.with(switchR.getContext()).clear(); //Clear perferences if switched off
                         break;
                     case -3:
                         Preferences.isExpanded = bool;
@@ -774,11 +766,11 @@ public class Menu {
                 editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (hasFocus) {
                             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                         } else {
-                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                         }
                     }
                 });
@@ -808,21 +800,21 @@ public class Menu {
 
                         button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num + "</font>"));
                         Preferences.changeFeatureInt(featName, featNum, num);
-editText.setFocusable(false);
+                        editText.setFocusable(false);
                     }
                 });
 
                 alertName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // dialog.cancel(); // closes dialog
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                     }
                 });
 
                 if (overlayRequired) {
                     AlertDialog dialog = alertName.create(); // display the dialog
-                    dialog.getWindow().setType(Build.VERSION.SDK_INT >= 26 ? 2038 : 2002);
+                    Objects.requireNonNull(dialog.getWindow()).setType(Build.VERSION.SDK_INT >= 26 ? 2038 : 2002);
                     dialog.show();
                 } else {
                     alertName.show();
@@ -861,11 +853,11 @@ editText.setFocusable(false);
                 editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (hasFocus) {
                             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                         } else {
-                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                         }
                     }
                 });
@@ -903,14 +895,14 @@ editText.setFocusable(false);
                 alertName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // dialog.cancel(); // closes dialog
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                     }
                 });
 
                 if (overlayRequired) {
                     AlertDialog dialog = alertName.create(); // display the dialog
-                    dialog.getWindow().setType(Build.VERSION.SDK_INT >= 26 ? 2038 : 2002);
+                    Objects.requireNonNull(dialog.getWindow()).setType(Build.VERSION.SDK_INT >= 26 ? 2038 : 2002);
                     dialog.show();
                 } else {
                     alertName.show();
@@ -945,11 +937,11 @@ editText.setFocusable(false);
                 editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (hasFocus) {
                             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                         } else {
-                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                         }
                     }
                 });
@@ -974,8 +966,8 @@ editText.setFocusable(false);
                 alertName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //dialog.cancel(); // closes dialog
-                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(getContext.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                        InputMethodManager imm = (InputMethodManager) getContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
                     }
                 });
 
@@ -998,8 +990,7 @@ editText.setFocusable(false);
         final CheckBox checkBox = new CheckBox(getContext);
         checkBox.setText(featName);
         checkBox.setTextColor(TEXT_COLOR_2);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            checkBox.setButtonTintList(ColorStateList.valueOf(CheckBoxColor));
+        checkBox.setButtonTintList(ColorStateList.valueOf(CheckBoxColor));
         checkBox.setChecked(Preferences.loadPrefBool(featName, featNum, switchedOn));
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -1014,6 +1005,7 @@ editText.setFocusable(false);
         linLayout.addView(checkBox);
     }
 
+    @SuppressLint("SetTextI18n")
     private void RadioButton(LinearLayout linLayout, final int featNum, String featName, final String list) {
         //Credit: LoraZalora
         final List<String> lists = new LinkedList<>(Arrays.asList(list.split(",")));
@@ -1039,8 +1031,7 @@ editText.setFocusable(false);
             System.out.println(lists.get(i));
             Radioo.setText(lists.get(i));
             Radioo.setTextColor(Color.LTGRAY);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                Radioo.setButtonTintList(ColorStateList.valueOf(RadioColor));
+            Radioo.setButtonTintList(ColorStateList.valueOf(RadioColor));
             Radioo.setOnClickListener(first_radio_listener);
             radioGroup.addView(Radioo);
         }
@@ -1053,6 +1044,7 @@ editText.setFocusable(false);
         linLayout.addView(radioGroup);
     }
 
+    @SuppressLint("SetTextI18n")
     private void Collapse(LinearLayout linLayout, final String text, final boolean expanded) {
         LinearLayout.LayoutParams layoutParamsLL = new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         layoutParamsLL.setMargins(0, 5, 0, 0);

@@ -2,9 +2,9 @@
 # Introduction
 ![GitHub](https://img.shields.io/github/license/LGLTeam/Android-Mod-Menu?style=flat-square)
 
-Floating mod menu for il2cpp and other native android games. KittyMemory, MSHook, And64InlineHook and basic string obfuscator (AY obfuscator) included. Assets are stored as base64 in cpp and does not need to be stored under assets folder.
+Floating mod menu for il2cpp and other native android games. KittyMemory, Dobby, xDL and basic string obfuscator (AY obfuscator) included. Assets are stored as base64 in cpp and does not need to be stored under assets folder.
 
-Support Android 4.4.x up to Android 15. ARMv7 and ARM64 are supported.
+Support Android 4.4.x up to Android 16. ARMv7 and ARM64 are supported.
 
 ![](Intro.gif)
 
@@ -23,11 +23,12 @@ If you have an issue with Hooking and game crashes, you should go to the **suppo
 # Credits
 Thanks to the following individuals whose code helped me develop this mod menu
 
-* Octowolve/Escanor - Mod menu: https://github.com/z3r0Sec/Substrate-Template-With-Mod-Menu and Hooking: https://github.com/z3r0Sec/Substrate-Hooking-Example
+* Octowolve/Escanor - Mod menu: https://github.com/z3r0Sec/Substrate-Template-With-Mod-Menu
 * VanHoevenTR - Mod menu - https://github.com/LGLTeam/VanHoevenTR_Android_Mod_Menu
 * MrIkso - First mod menu template https://github.com/MrIkso/FloatingModMenu
 * MJx0 A.K.A Ruit - https://github.com/MJx0/KittyMemory
-* Rprop - https://github.com/Rprop/And64InlineHook
+* hexhacking - https://github.com/hexhacking/xDL
+* jmpews - https://github.com/jmpews/Dobby
 * And everyone else who provided input and contributions to this project!
 
 # License
